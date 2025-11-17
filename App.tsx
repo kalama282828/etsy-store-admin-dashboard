@@ -6,6 +6,7 @@ import { supabase, supabaseUrl, supabaseAnonKey } from './lib/supabase';
 import LoginScreen from './components/LoginScreen';
 import Dashboard from './components/Dashboard';
 import UserDashboard from './components/UserDashboard';
+import Footer from './components/layout/Footer';
 import { SiteSettings } from './types';
 
 // Admin panel credentials for demonstration.
@@ -135,12 +136,22 @@ const App: React.FC = () => {
   const isAdmin = session?.user?.email === ADMIN_EMAIL;
 
   if (!session) {
-    return <LoginScreen siteSettings={siteSettings} />;
+    return (
+      <>
+        <LoginScreen siteSettings={siteSettings} />
+        <Footer text={siteSettings?.footer_text} />
+      </>
+    );
   }
   
-  return isAdmin 
-    ? <Dashboard siteSettings={siteSettings} onSettingsUpdate={fetchSiteSettings} /> 
-    : <UserDashboard user={session.user} siteSettings={siteSettings} />;
+  return (
+    <>
+      {isAdmin 
+        ? <Dashboard siteSettings={siteSettings} onSettingsUpdate={fetchSiteSettings} /> 
+        : <UserDashboard user={session.user} siteSettings={siteSettings} />}
+      <Footer text={siteSettings?.footer_text} />
+    </>
+  );
 };
 
 export default App;
