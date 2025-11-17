@@ -97,4 +97,5 @@ export interface SiteSettings {
   stripe_secret_key?: string | null;
   stripe_checkout_url?: string | null;
   favicon_url?: string | null;
+  footer_text?: string | null;
 }

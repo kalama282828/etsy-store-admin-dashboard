@@ -37,8 +37,9 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                         ...data,
                         page_title: data.page_title || data.site_name || 'Etsy Admin',
                         favicon_url: data.favicon_url || null,
+                        footer_text: data.footer_text || '',
                     }
-                    : { site_name: 'Etsy Admin', logo_url: null, page_title: 'Etsy Admin', favicon_url: null };
+                    : { site_name: 'Etsy Admin', logo_url: null, page_title: 'Etsy Admin', favicon_url: null, footer_text: '' };
                 setSettings(normalized);
             }
             setLoading(false);
@@ -166,6 +167,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                 logo_url: settings.logo_url,
                 page_title: settings.page_title || settings.site_name,
                 favicon_url: settings.favicon_url,
+                footer_text: settings.footer_text || '',
             })
             .eq('id', 1);
 
@@ -246,11 +248,11 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
 
                 <div>
                     <label className={labelBaseStyle}>Favicon</label>
-                    <div className="flex items-center gap-4 p-3 border border-slate-200 rounded-lg">
-                        <div className="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-md overflow-hidden">
-                            {settings.favicon_url ? (
-                                <img src={settings.favicon_url} alt="Favicon" className="h-8 w-8 object-contain" />
-                            ) : (
+                <div className="flex items-center gap-4 p-3 border border-slate-200 rounded-lg">
+                    <div className="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-md overflow-hidden">
+                        {settings.favicon_url ? (
+                            <img src={settings.favicon_url} alt="Favicon" className="h-8 w-8 object-contain" />
+                        ) : (
                                 <span className="text-xs text-slate-500">Yok</span>
                             )}
                         </div>
@@ -270,6 +272,18 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                             )}
                         </div>
                     </div>
+                </div>
+                
+                <div>
+                    <label htmlFor="footer_text" className={labelBaseStyle}>Footer Metni</label>
+                    <textarea
+                        id="footer_text"
+                        name="footer_text"
+                        value={settings.footer_text || ''}
+                        onChange={(e) => setSettings({ ...settings, footer_text: e.target.value })}
+                        className={`${inputBaseStyle} min-h-[80px]`}
+                        placeholder="© 2025 Şirket Adınız. Tüm hakları saklıdır."
+                    />
                 </div>
 
                 <div className="flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">

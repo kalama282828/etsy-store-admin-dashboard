@@ -68,6 +68,7 @@ const App: React.FC = () => {
                 stripe_secret_key: data.stripe_secret_key || '',
                 stripe_checkout_url: data.stripe_checkout_url || '',
                 favicon_url: data.favicon_url || '',
+                footer_text: data.footer_text || '',
               }
             : {
                 site_name: 'Etsy Admin',
@@ -77,6 +78,7 @@ const App: React.FC = () => {
                 stripe_secret_key: '',
                 stripe_checkout_url: '',
                 favicon_url: '',
+                footer_text: '',
               };
           setSiteSettings(normalized);
       }
@@ -103,7 +105,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const fallbackTitle = siteSettings?.page_title || siteSettings?.site_name || 'Etsy Store Admin';
     document.title = fallbackTitle;
-  }, [siteSettings]);
+  }, [siteSettings?.page_title, siteSettings?.site_name, siteSettings?.footer_text]);
 
   useEffect(() => {
     const faviconHref = siteSettings?.favicon_url || '/favicon.ico';

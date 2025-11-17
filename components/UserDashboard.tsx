@@ -332,18 +332,19 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                         </form>
                     </div>
 
-                    <div className="bg-primary-600 text-white rounded-2xl p-6 shadow flex flex-col md:flex-row md:items-center md:justify-between">
+                    <footer className="bg-primary-600 text-white rounded-2xl p-6 shadow flex flex-col md:flex-row md:items-center md:justify-between">
                         <div>
                             <p className="text-sm uppercase tracking-wide text-primary-100">Powered by Etsy Growth Lab</p>
                             <h3 className="text-2xl font-semibold mt-1">Analiz raporunuz hazırlanıyor</h3>
                             <p className="text-primary-100 mt-2 text-sm">Hazır olduğunda size e-posta ile bildireceğiz.</p>
                         </div>
-                        <div className="mt-4 md:mt-0">
+                        <div className="mt-4 md:mt-0 text-right">
                             <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/15 text-white text-sm font-semibold">
                                 Talep ID: {leadInfo?.id || 'bekleniyor'}
                             </span>
+                            <p className="text-xs text-primary-200 mt-2">{siteSettings?.footer_text || '© 2025 Etsy Admin Dashboard. All rights reserved.'}</p>
                         </div>
-                    </div>
+                    </footer>
                 </div>
 
                 {loading && (
