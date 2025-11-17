@@ -60,7 +60,10 @@ const App: React.FC = () => {
       if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
           console.error("Error fetching site settings:", error);
       } else {
-          setSiteSettings(data || { site_name: 'Etsy Admin', logo_url: null });
+          const normalized = data
+            ? { ...data, page_title: data.page_title || data.site_name || 'Etsy Store Admin' }
+            : { site_name: 'Etsy Admin', logo_url: null, page_title: 'Etsy Store Admin' };
+          setSiteSettings(normalized);
       }
       setLoadingSettings(false);
   };
@@ -81,6 +84,11 @@ const App: React.FC = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const fallbackTitle = siteSettings?.page_title || siteSettings?.site_name || 'Etsy Store Admin';
+    document.title = fallbackTitle;
+  }, [siteSettings]);
 
   if (loading || loadingSettings) {
     return (

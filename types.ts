@@ -92,4 +92,5 @@ export interface SiteSettings {
   id?: number;
   site_name: string;
   logo_url: string | null;
+  page_title?: string | null;
 }

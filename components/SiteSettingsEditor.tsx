@@ -32,7 +32,10 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                 console.error("Error fetching site settings:", error);
                 setError("Ayarlar yüklenirken bir hata oluştu.");
             } else {
-                setSettings(data || { site_name: 'Etsy Admin', logo_url: null });
+                const normalized = data
+                    ? { ...data, page_title: data.page_title || data.site_name || 'Etsy Admin' }
+                    : { site_name: 'Etsy Admin', logo_url: null, page_title: 'Etsy Admin' };
+                setSettings(normalized);
             }
             setLoading(false);
         };
@@ -41,7 +44,8 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!settings) return;
-        setSettings({ ...settings, site_name: e.target.value });
+        const { name, value } = e.target;
+        setSettings({ ...settings, [name]: value });
     };
 
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -104,7 +108,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
 
         const { error: updateError } = await supabase
             .from('site_settings')
-            .update({ site_name: settings.site_name, logo_url: settings.logo_url })
+            .update({ site_name: settings.site_name, logo_url: settings.logo_url, page_title: settings.page_title || settings.site_name })
             .eq('id', 1);
 
         if (updateError) {
@@ -140,7 +144,19 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
              <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                     <label htmlFor="site_name" className={labelBaseStyle}>Site İsmi</label>
-                    <input id="site_name" value={settings.site_name} onChange={handleInputChange} className={inputBaseStyle} />
+                    <input id="site_name" name="site_name" value={settings.site_name} onChange={handleInputChange} className={inputBaseStyle} />
+                </div>
+
+                <div>
+                    <label htmlFor="page_title" className={labelBaseStyle}>Tarayıcı Sekme Başlığı</label>
+                    <input
+                        id="page_title"
+                        name="page_title"
+                        value={settings.page_title || ''}
+                        onChange={handleInputChange}
+                        placeholder="Örn: Etsy Admin Paneli"
+                        className={inputBaseStyle}
+                    />
                 </div>
                 
                 <div>
