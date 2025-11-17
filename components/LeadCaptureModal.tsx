@@ -12,12 +12,30 @@ interface LeadCaptureModalProps {
 const inputBaseStyle = "block w-full px-4 py-2.5 text-slate-900 bg-slate-100 border border-transparent rounded-lg transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-300 focus:bg-white focus:border-primary-400";
 const labelBaseStyle = "block text-sm font-medium text-slate-700 mb-1.5";
 
+const RLS_ERROR_HELP = (
+    <div className="space-y-2 text-left">
+        <p className="text-sm text-red-700 font-semibold">Veritabanı güvenlik kuralları bu isteği engelliyor.</p>
+        <p className="text-xs text-red-700">
+            Supabase projenizde aşağıdaki SQL betiğini çalıştırarak <code className="bg-red-100 px-1 rounded">leads</code> tablosuna anonim eklemeleri (formu dolduran ziyaretçiler) için izin verin:
+        </p>
+        <pre className="bg-red-100 border border-red-200 rounded text-[11px] leading-tight p-2 overflow-x-auto">
+{`-- Lead formu için anonim ekleme politikası
+DROP POLICY IF EXISTS "Allow anonymous lead inserts" ON leads;
+CREATE POLICY "Allow anonymous lead inserts"
+ON leads FOR INSERT
+TO anon
+WITH CHECK (true);`}
+        </pre>
+        <p className="text-xs text-red-700">SQL Editor &gt; New query bölümüne yapıştırıp RUN butonuna basmanız yeterlidir.</p>
+    </div>
+);
+
 const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ packageName, onClose, stripeCheckoutUrl }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [storeUrl, setStoreUrl] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<React.ReactNode | null>(null);
     const [success, setSuccess] = useState(false);
     const [stripeRedirected, setStripeRedirected] = useState(false);
 
@@ -42,13 +60,20 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ packageName, onClos
                     selected_package: packageName
                 });
             
-            if (insertError) throw insertError;
+            if (insertError) {
+                if (insertError.message?.includes('row-level security')) {
+                    setError(RLS_ERROR_HELP);
+                } else {
+                    setError(insertError.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+                return;
+            }
 
             setSuccess(true);
             setStripeRedirected(false);
         } catch (err: any) {
-            setError('Bir hata oluştu. Lütfen tekrar deneyin.');
             console.error('Error saving lead:', err);
+            setError('Bir hata oluştu. Lütfen tekrar deneyin.');
         } finally {
             setLoading(false);
         }
@@ -126,7 +151,7 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ packageName, onClos
                                 <label htmlFor="store_url" className={labelBaseStyle}>Etsy Mağaza URL (İsteğe Bağlı)</label>
                                 <input type="url" name="store_url" id="store_url" value={storeUrl} onChange={e => setStoreUrl(e.target.value)} className={inputBaseStyle} placeholder="https://www.etsy.com/shop/..." />
                             </div>
-                            {error && <p className="text-sm text-red-600">{error}</p>}
+                            {error && <div className="text-sm text-red-600 space-y-2">{error}</div>}
                             <div className="pt-2">
                                 <button type="submit" disabled={loading} className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 disabled:opacity-50">
                                     {loading ? 'Gönderiliyor...' : 'Gönder'}
