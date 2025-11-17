@@ -1,23 +1,25 @@
 
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 interface LeadCaptureModalProps {
     packageName: string;
     onClose: () => void;
+    stripeCheckoutUrl?: string;
 }
 
 const inputBaseStyle = "block w-full px-4 py-2.5 text-slate-900 bg-slate-100 border border-transparent rounded-lg transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-300 focus:bg-white focus:border-primary-400";
 const labelBaseStyle = "block text-sm font-medium text-slate-700 mb-1.5";
 
-const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ packageName, onClose }) => {
+const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ packageName, onClose, stripeCheckoutUrl }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [storeUrl, setStoreUrl] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+    const [stripeRedirected, setStripeRedirected] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -43,6 +45,7 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ packageName, onClos
             if (insertError) throw insertError;
 
             setSuccess(true);
+            setStripeRedirected(false);
         } catch (err: any) {
             setError('Bir hata oluştu. Lütfen tekrar deneyin.');
             console.error('Error saving lead:', err);
@@ -50,6 +53,13 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ packageName, onClos
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (success && stripeCheckoutUrl && !stripeRedirected) {
+            window.open(stripeCheckoutUrl, '_blank', 'noopener,noreferrer');
+            setStripeRedirected(true);
+        }
+    }, [success, stripeCheckoutUrl, stripeRedirected]);
 
     return (
          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 transition-opacity duration-300 animate-fadeIn">
@@ -73,6 +83,20 @@ const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({ packageName, onClos
                         </div>
                         <h3 className="mt-4 text-xl font-bold text-slate-800">Teşekkürler!</h3>
                         <p className="mt-2 text-slate-600">Bilgilerinizi aldık. Ekibimiz en kısa sürede sizinle iletişime geçecektir.</p>
+                        {stripeCheckoutUrl ? (
+                            <a
+                                href={stripeCheckoutUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="mt-6 w-full inline-flex justify-center rounded-full border border-transparent shadow-sm px-4 py-2.5 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300"
+                            >
+                                Stripe ile Ödemeyi Tamamla
+                            </a>
+                        ) : (
+                            <p className="mt-4 text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                                Stripe ödeme bağlantısı henüz yapılandırılmadı. Ödeme adımına geçebilmek için yöneticiden link talep edebilirsiniz.
+                            </p>
+                        )}
                         <button
                             onClick={onClose}
                             className="mt-6 w-full inline-flex justify-center rounded-full border border-transparent shadow-sm px-4 py-2.5 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300"

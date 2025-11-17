@@ -61,8 +61,21 @@ const App: React.FC = () => {
           console.error("Error fetching site settings:", error);
       } else {
           const normalized = data
-            ? { ...data, page_title: data.page_title || data.site_name || 'Etsy Store Admin' }
-            : { site_name: 'Etsy Admin', logo_url: null, page_title: 'Etsy Store Admin' };
+            ? {
+                ...data,
+                page_title: data.page_title || data.site_name || 'Etsy Store Admin',
+                stripe_publishable_key: data.stripe_publishable_key || '',
+                stripe_secret_key: data.stripe_secret_key || '',
+                stripe_checkout_url: data.stripe_checkout_url || '',
+              }
+            : {
+                site_name: 'Etsy Admin',
+                logo_url: null,
+                page_title: 'Etsy Store Admin',
+                stripe_publishable_key: '',
+                stripe_secret_key: '',
+                stripe_checkout_url: '',
+              };
           setSiteSettings(normalized);
       }
       setLoadingSettings(false);

@@ -93,4 +93,7 @@ export interface SiteSettings {
   site_name: string;
   logo_url: string | null;
   page_title?: string | null;
+  stripe_publishable_key?: string | null;
+  stripe_secret_key?: string | null;
+  stripe_checkout_url?: string | null;
 }

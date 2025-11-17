@@ -15,6 +15,8 @@ import ConversionBooster from './ConversionBooster';
 import LayoutDashboardIcon from './icons/LayoutDashboardIcon';
 import SparklesIcon from './icons/SparklesIcon';
 import SiteSettingsEditor from './SiteSettingsEditor';
+import StripeSettings from './StripeSettings';
+import CreditCardIcon from './icons/CreditCardIcon';
 
 interface DashboardProps {
     siteSettings: SiteSettings | null;
@@ -93,6 +95,13 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                 );
             case 'booster':
                 return <ConversionBooster />;
+            case 'stripe':
+                return (
+                    <div className="space-y-8">
+                        <h1 className="text-3xl font-bold text-slate-900">Stripe Entegrasyonu</h1>
+                        <StripeSettings />
+                    </div>
+                );
             default:
                 return null;
         }
@@ -127,6 +136,12 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                         label="Dönüşüm Arttırıcı"
                         isActive={activeView === 'booster'}
                         onClick={() => setActiveView('booster')}
+                    />
+                    <NavItem
+                        icon={<CreditCardIcon />}
+                        label="Stripe Ayarları"
+                        isActive={activeView === 'stripe'}
+                        onClick={() => setActiveView('stripe')}
                     />
                 </nav>
             </aside>

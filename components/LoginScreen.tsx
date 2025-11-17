@@ -210,6 +210,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
             <LeadCaptureModal 
                 packageName={selectedPackage} 
                 onClose={() => setIsLeadModalOpen(false)} 
+                stripeCheckoutUrl={siteSettings?.stripe_checkout_url || undefined}
             />
         )}
 
