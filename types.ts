@@ -96,4 +96,5 @@ export interface SiteSettings {
   stripe_publishable_key?: string | null;
   stripe_secret_key?: string | null;
   stripe_checkout_url?: string | null;
+  favicon_url?: string | null;
 }

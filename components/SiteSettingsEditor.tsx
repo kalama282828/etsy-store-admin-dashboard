@@ -33,8 +33,12 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                 setError("Ayarlar yüklenirken bir hata oluştu.");
             } else {
                 const normalized = data
-                    ? { ...data, page_title: data.page_title || data.site_name || 'Etsy Admin' }
-                    : { site_name: 'Etsy Admin', logo_url: null, page_title: 'Etsy Admin' };
+                    ? {
+                        ...data,
+                        page_title: data.page_title || data.site_name || 'Etsy Admin',
+                        favicon_url: data.favicon_url || null,
+                    }
+                    : { site_name: 'Etsy Admin', logo_url: null, page_title: 'Etsy Admin', favicon_url: null };
                 setSettings(normalized);
             }
             setLoading(false);
@@ -48,7 +52,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
         setSettings({ ...settings, [name]: value });
     };
 
-    const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file || !settings) return;
 
@@ -80,6 +84,37 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
         event.target.value = '';
     };
 
+    const handleFaviconUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file || !settings) return;
+
+        setUploading(true);
+        setError(null);
+
+        if (settings.favicon_url) {
+            const oldFileName = settings.favicon_url.split('/').pop();
+            if (oldFileName) {
+                await supabase.storage.from(BUCKET_NAME).remove([oldFileName]);
+            }
+        }
+
+        const fileName = `favicon-${Date.now()}`;
+        const { data, error: uploadError } = await supabase.storage
+            .from(BUCKET_NAME)
+            .upload(fileName, file);
+
+        if (uploadError) {
+            console.error("Favicon upload error:", uploadError);
+            setError(`Favicon yüklenirken hata oluştu: ${uploadError.message}`);
+        } else {
+            const { data: urlData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(data.path);
+            setSettings({ ...settings, favicon_url: urlData.publicUrl });
+        }
+
+        setUploading(false);
+        event.target.value = '';
+    };
+
     const handleDeleteLogo = async () => {
         if (!settings || !settings.logo_url) return;
         if (!window.confirm("Mevcut logoyu silmek istediğinizden emin misiniz?")) return;
@@ -98,6 +133,24 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
         }
     };
 
+    const handleDeleteFavicon = async () => {
+        if (!settings || !settings.favicon_url) return;
+        if (!window.confirm("Mevcut faviconu silmek istediğinizden emin misiniz?")) return;
+
+        const fileName = settings.favicon_url.split('/').pop();
+        if (!fileName) {
+            setError("Favicon dosya adı alınamadı.");
+            return;
+        }
+
+        const { error: deleteError } = await supabase.storage.from(BUCKET_NAME).remove([fileName]);
+        if (deleteError) {
+            setError(`Favicon silinirken bir hata oluştu: ${deleteError.message}`);
+        } else {
+            setSettings({ ...settings, favicon_url: null });
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!settings) return;
@@ -108,7 +161,12 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
 
         const { error: updateError } = await supabase
             .from('site_settings')
-            .update({ site_name: settings.site_name, logo_url: settings.logo_url, page_title: settings.page_title || settings.site_name })
+            .update({
+                site_name: settings.site_name,
+                logo_url: settings.logo_url,
+                page_title: settings.page_title || settings.site_name,
+                favicon_url: settings.favicon_url,
+            })
             .eq('id', 1);
 
         if (updateError) {
@@ -175,11 +233,39 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                             </label>
                             <input
                                 id="logo-upload" type="file" accept="image/png, image/jpeg, image/svg+xml"
-                                className="hidden" onChange={handleUpload} disabled={uploading}
+                                className="hidden" onChange={handleLogoUpload} disabled={uploading}
                             />
                             {settings.logo_url && (
                                 <button type="button" onClick={handleDeleteLogo} className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors">
                                     <DeleteIcon /> Logoyu Sil
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label className={labelBaseStyle}>Favicon</label>
+                    <div className="flex items-center gap-4 p-3 border border-slate-200 rounded-lg">
+                        <div className="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-md overflow-hidden">
+                            {settings.favicon_url ? (
+                                <img src={settings.favicon_url} alt="Favicon" className="h-8 w-8 object-contain" />
+                            ) : (
+                                <span className="text-xs text-slate-500">Yok</span>
+                            )}
+                        </div>
+                        <div className="flex-grow space-y-2">
+                             <label htmlFor="favicon-upload" className={`w-full text-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                                {uploading ? 'Yükleniyor...' : 'Favicon Yükle'}
+                            </label>
+                            <input
+                                id="favicon-upload" type="file" accept="image/png, image/x-icon, image/svg+xml"
+                                className="hidden" onChange={handleFaviconUpload} disabled={uploading}
+                            />
+                            <p className="text-xs text-slate-500">Önerilen boyut: 32x32px .ico veya .png</p>
+                            {settings.favicon_url && (
+                                <button type="button" onClick={handleDeleteFavicon} className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors">
+                                    <DeleteIcon /> Faviconu Sil
                                 </button>
                             )}
                         </div>
