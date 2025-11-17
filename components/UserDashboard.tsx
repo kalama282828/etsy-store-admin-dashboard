@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useMemo, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
@@ -19,8 +17,12 @@ const checklist = [
 const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => {
     const [leadInfo, setLeadInfo] = useState<Lead | null>(null);
     const [packages, setPackages] = useState<Package[]>([]);
+    const [storeUrl, setStoreUrl] = useState('');
+    const [selectedPackage, setSelectedPackage] = useState<string>('');
     const [loading, setLoading] = useState(true);
+    const [savingSelection, setSavingSelection] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [selectionMessage, setSelectionMessage] = useState<string | null>(null);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -37,16 +39,17 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                 .order('created_at', { ascending: false })
                 .limit(1)
                 .maybeSingle();
-            const packagePromise = supabase
+
+            const packagesPromise = supabase
                 .from('packages')
                 .select('*')
                 .order('price', { ascending: true });
 
-            const [{ data: leadData, error: leadError }, { data: packageData, error: packageError }] = await Promise.all([leadPromise, packagePromise]);
+            const [{ data: leadData, error: leadError }, { data: packageData, error: packageError }] = await Promise.all([leadPromise, packagesPromise]);
 
             if (leadError && leadError.code !== 'PGRST116') {
                 console.error('Lead fetch error', leadError);
-                setError('Lead bilgileri alınırken bir hata oluştu.');
+                setError('Lead bilgileriniz alınırken bir hata oluştu.');
             } else {
                 setLeadInfo(leadData || null);
             }
@@ -62,6 +65,17 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
         fetchData();
     }, [user.email]);
 
+    useEffect(() => {
+        if (leadInfo?.store_url) {
+            setStoreUrl(leadInfo.store_url);
+        } else if (user.user_metadata?.etsy_store_url) {
+            setStoreUrl(user.user_metadata.etsy_store_url);
+        }
+        if (leadInfo?.selected_package) {
+            setSelectedPackage(leadInfo.selected_package);
+        }
+    }, [leadInfo, user.user_metadata]);
+
     const currentPackage = useMemo(() => {
         if (!leadInfo) return null;
         return packages.find(pkg => pkg.name === leadInfo.selected_package) || null;
@@ -69,10 +83,63 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
 
     const profileItems = [
         { label: 'E-posta', value: user.email },
-        { label: 'Mağaza URL', value: leadInfo?.store_url || user.user_metadata?.etsy_store_url || 'Belirtilmemiş' },
-        { label: 'Seçilen Paket', value: leadInfo?.selected_package || 'Henüz paket seçilmemiş' },
-        { label: 'Kayıt Tarihi', value: leadInfo?.created_at ? new Date(leadInfo.created_at).toLocaleString('tr-TR') : 'Bekleniyor' },
+        { label: 'Mağaza URL', value: leadInfo?.store_url || storeUrl || 'Belirtilmemiş' },
+        { label: 'Seçilen Paket', value: leadInfo?.selected_package || 'Henüz paket seçilmedi' },
+        { label: 'Kayıt Tarihi', value: leadInfo?.created_at ? new Date(leadInfo.created_at).toLocaleString('tr-TR') : 'Bekliyor' },
     ];
+
+    const handlePackageSelect = (pkgName: string) => {
+        setSelectedPackage(pkgName);
+        setSelectionMessage(null);
+    };
+
+    const handlePackageSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedPackage) {
+            setSelectionMessage('Lütfen bir paket seçin.');
+            return;
+        }
+        if (!storeUrl || !storeUrl.includes('etsy.com')) {
+            setSelectionMessage('Lütfen geçerli bir Etsy mağaza URL\'si girin.');
+            return;
+        }
+
+        setSavingSelection(true);
+        setSelectionMessage(null);
+
+        const payload = {
+            name: user.user_metadata?.full_name || user.email,
+            email: user.email,
+            store_url: storeUrl,
+            selected_package: selectedPackage,
+        };
+
+        let response;
+        if (leadInfo?.id) {
+            response = await supabase.from('leads')
+                .update(payload)
+                .eq('id', leadInfo.id)
+                .select()
+                .single();
+        } else {
+            response = await supabase.from('leads')
+                .insert(payload)
+                .select()
+                .single();
+        }
+
+        if (response.error) {
+            console.error('Lead selection error', response.error);
+            setSelectionMessage(response.error.message || 'Paket seçiminiz kaydedilemedi.');
+        } else {
+            setLeadInfo(response.data as Lead);
+            setSelectionMessage('Paket seçiminiz kaydedildi! Stripe ödeme sayfasına yönlendiriliyorsunuz.');
+            if (siteSettings?.stripe_checkout_url) {
+                window.open(siteSettings.stripe_checkout_url, '_blank', 'noopener,noreferrer');
+            }
+        }
+        setSavingSelection(false);
+    };
 
     return (
         <div className="min-h-screen bg-slate-100">
@@ -109,13 +176,13 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                                 <p className="text-sm text-slate-500">Merhaba</p>
                                 <h1 className="text-3xl font-semibold text-slate-900">{user.user_metadata?.full_name || user.email}</h1>
                                 <p className="text-slate-500 mt-1">
-                                    Lead talebiniz {leadInfo?.created_at ? new Date(leadInfo.created_at).toLocaleDateString('tr-TR') : 'henüz kaydedilmedi'} tarihinde alındı.
+                                    Talebiniz {leadInfo?.created_at ? new Date(leadInfo.created_at).toLocaleDateString('tr-TR') : 'henüz kaydedilmedi'} tarihinde alındı.
                                 </p>
                             </div>
                             <div className="flex gap-4">
                                 <div className="text-center">
                                     <p className="text-xs uppercase tracking-wide text-slate-500">Paket</p>
-                                    <p className="text-lg font-semibold text-slate-800">{leadInfo?.selected_package || 'Seçilmedi'}</p>
+                                    <p className="text-lg font-semibold text-slate-800">{leadInfo?.selected_package || selectedPackage || 'Seçilmedi'}</p>
                                 </div>
                                 <div className="text-center">
                                     <p className="text-xs uppercase tracking-wide text-slate-500">Durum</p>
@@ -147,7 +214,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                             <h2 className="text-lg font-semibold text-slate-900 mb-3">Onboarding Durumu</h2>
                             <div className="space-y-3">
                                 {checklist.map((item, idx) => {
-                                    const completed = leadInfo ? idx === 0 || idx === 1 : idx === 0;
+                                    const completed = leadInfo ? idx <= 1 : idx === 0;
                                     return (
                                         <div key={item.id} className="flex items-start gap-3">
                                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${completed ? 'bg-primary-500' : 'bg-slate-300'}`}>
@@ -212,6 +279,57 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                                 </a>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-2xl shadow">
+                        <h2 className="text-lg font-semibold text-slate-900 mb-4">Paket Seçimi & Ödeme</h2>
+                        <form onSubmit={handlePackageSubmit} className="space-y-4">
+                            <div>
+                                <label htmlFor="storeUrl" className="text-sm font-medium text-slate-700">Etsy Mağaza URL&apos;niz</label>
+                                <input
+                                    id="storeUrl"
+                                    type="url"
+                                    value={storeUrl}
+                                    onChange={(e) => setStoreUrl(e.target.value)}
+                                    placeholder="https://www.etsy.com/shop/..."
+                                    className="mt-1 block w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                                />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-slate-700 mb-2">Paket seçimi</p>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    {packages.map(pkg => (
+                                        <button
+                                            type="button"
+                                            key={pkg.name}
+                                            onClick={() => handlePackageSelect(pkg.name)}
+                                            className={`text-left border rounded-xl p-4 transition-all ${selectedPackage === pkg.name ? 'border-primary-500 bg-primary-50 shadow' : 'border-slate-200 hover:border-primary-200'}`}
+                                        >
+                                            <p className="text-sm font-semibold text-slate-900">{pkg.name}</p>
+                                            <p className="text-lg font-bold text-slate-800">${pkg.price}<span className="text-xs text-slate-500">/ay</span></p>
+                                            <p className="text-xs text-slate-500">{pkg.features[0]}</p>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            {selectionMessage && (
+                                <div className={`text-sm ${selectionMessage.includes('Lütfen') || selectionMessage.includes('hata') ? 'text-red-600' : 'text-green-600'}`}>
+                                    {selectionMessage}
+                                </div>
+                            )}
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <p className="text-xs text-slate-500">
+                                    “Kaydet & Stripe’a Git” butonuna tıkladığınızda seçiminiz kaydedilir ve ödeme adımına yönlendirilirsiniz.
+                                </p>
+                                <button
+                                    type="submit"
+                                    disabled={savingSelection}
+                                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 disabled:opacity-50"
+                                >
+                                    {savingSelection ? 'Kaydediliyor...' : 'Kaydet & Stripe’a Git'}
+                                </button>
+                            </div>
+                        </form>
                     </div>
 
                     <div className="bg-primary-600 text-white rounded-2xl p-6 shadow flex flex-col md:flex-row md:items-center md:justify-between">
