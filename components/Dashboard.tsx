@@ -81,7 +81,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                            <SiteSettingsEditor onUpdate={onSettingsUpdate} />
                         </div>
                         <ProofEditor />
-                        <LeadsTable leads={leads} />
+                        <LeadsTable leads={leads} onRefresh={fetchData} />
                         <UserTable users={registeredUsers} />
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             <div className="lg:col-span-2">

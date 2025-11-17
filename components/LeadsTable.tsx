@@ -1,20 +1,24 @@
-
-
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Lead } from '../types';
+import { supabase } from '../lib/supabase';
+import DeleteIcon from './icons/DeleteIcon';
+import AdminLeadFormModal from './AdminLeadFormModal';
 
 interface LeadsTableProps {
     leads: Lead[];
+    onRefresh?: () => void;
 }
 
-const LeadsTable: React.FC<LeadsTableProps> = ({ leads }) => {
+const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
     const [searchTerm, setSearchTerm] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [downloading, setDownloading] = useState(false);
 
-    const filteredLeads = leads.filter(lead =>
+    const filteredLeads = useMemo(() => leads.filter(lead =>
         (lead.name && lead.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (lead.email && lead.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (lead.store_url && lead.store_url.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    ), [leads, searchTerm]);
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleString('tr-TR', {
@@ -23,21 +27,74 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads }) => {
         });
     };
 
+    const handleDelete = async (leadId: number) => {
+        if (!window.confirm('Bu lead kaydını silmek istediğinizden emin misiniz?')) return;
+        const { error } = await supabase.from('leads').delete().eq('id', leadId);
+        if (error) {
+            alert(`Lead silinirken bir hata oluştu: ${error.message}`);
+        } else {
+            onRefresh?.();
+        }
+    };
+
+    const downloadCsv = () => {
+        if (filteredLeads.length === 0) return;
+        setDownloading(true);
+        const headers = ['İsim', 'E-posta', 'Mağaza URL', 'Paket', 'Tarih'];
+        const rows = filteredLeads.map(lead => [
+            lead.name || '',
+            lead.email || '',
+            lead.store_url || '',
+            lead.selected_package || '',
+            lead.created_at ? formatDate(lead.created_at) : ''
+        ]);
+
+        const csvContent = [headers, ...rows]
+            .map(row => row.map(col => `"${(col || '').replace(/"/g, '""')}"`).join(','))
+            .join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `leads-${new Date().toISOString().slice(0, 10)}.csv`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        setDownloading(false);
+    };
+
     return (
         <div className="bg-white p-6 rounded-2xl shadow-xl">
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+            <div className="flex flex-col lg:flex-row justify-between items-center mb-4 gap-4">
                 <h2 className="text-xl font-bold text-slate-800">Müşteri Adayları (Leads)</h2>
-                 <div className="relative w-full sm:w-auto">
-                    <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                    </svg>
-                    <input
-                        type="text"
-                        placeholder="İsim, email veya mağaza ara..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full sm:w-64 pl-10 pr-4 py-2.5 text-sm bg-slate-100 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:bg-white"
-                    />
+                <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                    <div className="relative flex-1">
+                        <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                        <input
+                            type="text"
+                            placeholder="İsim, email veya mağaza ara..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-100 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:bg-white"
+                        />
+                    </div>
+                    <div className="flex gap-2 sm:flex-shrink-0">
+                        <button
+                            onClick={downloadCsv}
+                            disabled={filteredLeads.length === 0 || downloading}
+                            className="px-4 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
+                        >
+                            {downloading ? 'Hazırlanıyor...' : '.CSV indir'}
+                        </button>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
+                        >
+                            Yeni Lead
+                        </button>
+                    </div>
                 </div>
             </div>
             <div className="overflow-x-auto">
@@ -47,7 +104,8 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads }) => {
                             <th scope="col" className="px-6 py-3 rounded-l-lg">İsim</th>
                             <th scope="col" className="px-6 py-3">Mağaza URL</th>
                             <th scope="col" className="px-6 py-3">Seçilen Paket</th>
-                            <th scope="col" className="px-6 py-3 rounded-r-lg">Tarih</th>
+                            <th scope="col" className="px-6 py-3">Tarih</th>
+                            <th scope="col" className="px-6 py-3 text-center rounded-r-lg">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,11 +131,20 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads }) => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 border-b border-slate-100">{formatDate(lead.created_at)}</td>
+                                    <td className="px-6 py-4 border-b border-slate-100 text-center">
+                                        <button
+                                            onClick={() => handleDelete(lead.id)}
+                                            className="p-2 text-slate-500 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors"
+                                            aria-label="Lead Sil"
+                                        >
+                                            <DeleteIcon />
+                                        </button>
+                                    </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={4} className="text-center py-8 text-slate-500">
+                                <td colSpan={5} className="text-center py-8 text-slate-500">
                                     {leads.length === 0 ? "Henüz müşteri adayı bulunmuyor." : "Aramanızla eşleşen sonuç bulunamadı."}
                                 </td>
                             </tr>
@@ -85,6 +152,12 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads }) => {
                     </tbody>
                 </table>
             </div>
+            {isModalOpen && (
+                <AdminLeadFormModal
+                    onClose={() => setIsModalOpen(false)}
+                    onSaved={onRefresh || (() => undefined)}
+                />
+            )}
         </div>
     );
 };
