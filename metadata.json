@@ -1,0 +1,5 @@
+{
+  "name": "Etsy Store Admin Dashboard",
+  "description": "An admin panel for Etsy store owners to track customers and manage subscription packages with a simulated Stripe payment system.",
+  "requestFramePermissions": []
+}
