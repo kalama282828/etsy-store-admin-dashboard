@@ -276,18 +276,6 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                     </div>
                 </div>
                 
-                <div>
-                    <label htmlFor="blog_topic" className={labelBaseStyle}>AI Blog Konu Başlığı</label>
-                    <textarea
-                        id="blog_topic"
-                        name="blog_topic"
-                        value={settings.blog_topic || ''}
-                        onChange={(e) => setSettings({ ...settings, blog_topic: e.target.value })}
-                        className={`${inputBaseStyle} min-h-[80px]`}
-                        placeholder="Örn: Etsy mağazamız için hizmet tanıtım yazıları"
-                    />
-                    <p className="text-xs text-slate-500 mt-1">Buraya girilen konu otomatik blog üretim scriptine aktarılır.</p>
-                </div>
                 
                 <div>
                     <label htmlFor="footer_text" className={labelBaseStyle}>Footer Metni</label>
