@@ -74,7 +74,8 @@ const BlogGeneratorPanel: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error(`Gemini API hatası: ${response.statusText}`);
+                const errorBody = await response.text().catch(() => '');
+                throw new Error(`Gemini API hatası: ${response.status} ${response.statusText || ''} ${errorBody}`);
             }
 
             const data = await response.json();
