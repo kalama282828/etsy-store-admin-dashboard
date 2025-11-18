@@ -66,38 +66,42 @@
       }
     </style>
     <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-            },
-            colors: {
-              primary: {
-                '50': '#eff6ff',
-                '100': '#dbeafe',
-                '200': '#bfdbfe',
-                '300': '#93c5fd',
-                '400': '#60a5fa',
-                '500': '#3b82f6',
-                '600': '#2563eb',
-                '700': '#1d4ed8',
-                '800': '#1e40af',
-                '900': '#1e3a8a',
-                '950': '#172554',
+      if (window.tailwind) {
+        tailwind.config = {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['Inter', 'sans-serif'],
               },
-            },
-            animation: {
-                'marquee-slow': 'marquee-slow 80s linear infinite',
-            },
-            keyframes: {
-                'marquee-slow': {
-                    'from': { transform: 'translateX(0)' },
-                    'to': { transform: 'translateX(-50%)' },
-                }
+              colors: {
+                primary: {
+                  '50': '#eff6ff',
+                  '100': '#dbeafe',
+                  '200': '#bfdbfe',
+                  '300': '#93c5fd',
+                  '400': '#60a5fa',
+                  '500': '#3b82f6',
+                  '600': '#2563eb',
+                  '700': '#1d4ed8',
+                  '800': '#1e40af',
+                  '900': '#1e3a8a',
+                  '950': '#172554',
+                },
+              },
+              animation: {
+                  'marquee-slow': 'marquee-slow 80s linear infinite',
+              },
+              keyframes: {
+                  'marquee-slow': {
+                      'from': { transform: 'translateX(0)' },
+                      'to': { transform: 'translateX(-50%)' },
+                  }
+              }
             }
           }
-        }
+        };
+      } else {
+        console.warn('Tailwind CDN yüklenemedi. Eğer bu bir browser extension ise tailwind sınıfları uygulanmayabilir.');
       }
     </script>
   <script type="importmap">
