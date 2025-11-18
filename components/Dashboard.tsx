@@ -19,6 +19,7 @@ import StripeSettings from './StripeSettings';
 import CreditCardIcon from './icons/CreditCardIcon';
 import BlogManager from './BlogManager';
 import BlogGeneratorPanel from './BlogGeneratorPanel';
+import UserMessagingPanel from './UserMessagingPanel';
 
 interface DashboardProps {
     siteSettings: SiteSettings | null;
@@ -84,6 +85,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                         </div>
                         <ProofEditor />
                         <LeadsTable leads={leads} onRefresh={fetchData} />
+                        <UserMessagingPanel users={registeredUsers} />
                         <BlogManager />
                         <UserTable users={registeredUsers} />
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
