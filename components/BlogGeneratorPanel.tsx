@@ -13,17 +13,22 @@ const BlogGeneratorPanel: React.FC = () => {
         const fetchTopic = async () => {
             const { data, error } = await supabase
                 .from('site_settings')
-                .select('blog_topic')
+                .select('blog_topic, gemini_api_key')
                 .eq('id', 1)
                 .maybeSingle();
 
-            if (!error && data?.blog_topic) {
-                setTopic(data.blog_topic);
+            if (!error && data) {
+                if (data.blog_topic) setTopic(data.blog_topic);
+                if (data.gemini_api_key) setGeminiKey(data.gemini_api_key);
             }
             setLoading(false);
         };
         fetchTopic();
     }, []);
+
+    const handleKeyChange = (value: string) => {
+        setGeminiKey(value);
+    };
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,7 +36,7 @@ const BlogGeneratorPanel: React.FC = () => {
         setMessage(null);
         const { error } = await supabase
             .from('site_settings')
-            .update({ blog_topic: topic })
+            .update({ blog_topic: topic, gemini_api_key: geminiKey })
             .eq('id', 1);
         if (error) {
             setMessage(error.message);
@@ -143,11 +148,11 @@ const BlogGeneratorPanel: React.FC = () => {
                         id="gemini_key"
                         type="password"
                         value={geminiKey}
-                        onChange={(e) => setGeminiKey(e.target.value)}
+                        onChange={(e) => handleKeyChange(e.target.value)}
                         className="mt-1 block w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
                         placeholder="AI içerik üretimi için Google Gemini anahtarınızı girin"
                     />
-                    <p className="text-xs text-slate-500 mt-1">Anahtar tarayıcıda tutulur, sadece bu oturumda kullanılır.</p>
+                    <p className="text-xs text-slate-500 mt-1">Anahtar Supabase’de saklanır ve hem panel hem de CLI komutları için kullanılabilir.</p>
                 </div>
                 {message && <p className="text-sm text-primary-600">{message}</p>}
                 <div className="flex justify-end">

@@ -70,6 +70,8 @@ const App: React.FC = () => {
                 stripe_checkout_url: data.stripe_checkout_url || '',
                 favicon_url: data.favicon_url || '',
                 footer_text: data.footer_text || '',
+                blog_topic: data.blog_topic || '',
+                gemini_api_key: data.gemini_api_key || '',
               }
             : {
                 site_name: 'Etsy Admin',
@@ -80,6 +82,8 @@ const App: React.FC = () => {
                 stripe_checkout_url: '',
                 favicon_url: '',
                 footer_text: '',
+                blog_topic: '',
+                gemini_api_key: '',
               };
           setSiteSettings(normalized);
       }

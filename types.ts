@@ -99,6 +99,7 @@ export interface SiteSettings {
   favicon_url?: string | null;
   footer_text?: string | null;
   blog_topic?: string | null;
+  gemini_api_key?: string | null;
 }
 
 export interface BlogPost {
