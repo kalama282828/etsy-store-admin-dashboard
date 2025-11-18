@@ -18,6 +18,7 @@ import SiteSettingsEditor from './SiteSettingsEditor';
 import StripeSettings from './StripeSettings';
 import CreditCardIcon from './icons/CreditCardIcon';
 import BlogManager from './BlogManager';
+import BlogGeneratorPanel from './BlogGeneratorPanel';
 
 interface DashboardProps {
     siteSettings: SiteSettings | null;
@@ -104,6 +105,14 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                         <StripeSettings />
                     </div>
                 );
+            case 'blog':
+                return (
+                    <div className="space-y-8">
+                        <h1 className="text-3xl font-bold text-slate-900">Blog & AI İçerik</h1>
+                        <BlogGeneratorPanel />
+                        <BlogManager />
+                    </div>
+                );
             default:
                 return null;
         }
@@ -144,6 +153,16 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                         label="Stripe Ayarları"
                         isActive={activeView === 'stripe'}
                         onClick={() => setActiveView('stripe')}
+                    />
+                    <NavItem
+                        icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M4 5h16a1 1 0 011 1v9a1 1 0 01-1 1h-7v2h5a1 1 0 110 2H8a1 1 0 110-2h5v-2H4a1 1 0 01-1-1V6a1 1 0 011-1zm1 9h14V7H5v7z" />
+                            </svg>
+                        }
+                        label="Blog / AI"
+                        isActive={activeView === 'blog'}
+                        onClick={() => setActiveView('blog')}
                     />
                 </nav>
             </aside>
