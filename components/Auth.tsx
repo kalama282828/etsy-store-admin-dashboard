@@ -5,18 +5,49 @@ import { supabase } from '../lib/supabase';
 
 interface AuthProps {
     etsyUrl?: string;
+    language?: 'tr' | 'en';
 }
 
 const inputBaseStyle = "block w-full px-4 py-2.5 text-slate-900 bg-slate-100 border border-transparent rounded-lg transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-300 focus:bg-white focus:border-primary-400";
 const labelBaseStyle = "block text-sm font-medium text-slate-700 mb-1.5";
 
+const texts = {
+    tr: {
+        loginTitle: 'Tekrar Hoş Geldiniz',
+        signupTitle: 'Hesap Oluştur',
+        loginToggle: 'Giriş Yap',
+        signupToggle: 'Kayıt Ol',
+        emailLabel: 'E-posta adresi',
+        passwordLabel: 'Şifre',
+        submitLogin: 'Giriş Yap',
+        submitSignup: 'Kayıt Ol',
+        processing: 'İşleniyor...',
+        noAccount: 'Hesabınız yok mu?',
+        haveAccount: 'Zaten bir hesabınız var mı?',
+    },
+    en: {
+        loginTitle: 'Welcome back',
+        signupTitle: 'Create an account',
+        loginToggle: 'Sign In',
+        signupToggle: 'Sign Up',
+        emailLabel: 'Email address',
+        passwordLabel: 'Password',
+        submitLogin: 'Sign In',
+        submitSignup: 'Sign Up',
+        processing: 'Processing...',
+        noAccount: "Don't have an account?",
+        haveAccount: 'Already have an account?',
+    },
+};
 
-const Auth: React.FC<AuthProps> = ({ etsyUrl }) => {
+const Auth: React.FC<AuthProps> = ({ etsyUrl, language = 'tr' }) => {
     const [loading, setLoading] = useState(false);
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+
+    const locale = texts[language];
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -56,12 +87,12 @@ const Auth: React.FC<AuthProps> = ({ etsyUrl }) => {
         <div className="space-y-6">
             <div>
                 <h2 className="text-2xl font-bold text-center text-slate-800">
-                    {isLogin ? 'Tekrar Hoş Geldiniz' : 'Hesap Oluştur'}
+                    {isLogin ? locale.loginTitle : locale.signupTitle}
                 </h2>
-                <p className="text-center text-slate-500">
-                    {isLogin ? "Hesabınız yok mu?" : 'Zaten bir hesabınız var mı?'}
+            <p className="text-center text-slate-500">
+                    {isLogin ? locale.noAccount : locale.haveAccount}
                     <button onClick={() => { setIsLogin(!isLogin); setMessage(null) }} className="font-medium text-primary-600 hover:text-primary-500 ml-1">
-                        {isLogin ? 'Kayıt Ol' : 'Giriş Yap'}
+                        {isLogin ? locale.signupToggle : locale.loginToggle}
                     </button>
                 </p>
             </div>
@@ -69,7 +100,7 @@ const Auth: React.FC<AuthProps> = ({ etsyUrl }) => {
             <form className="space-y-4" onSubmit={handleAuth}>
                 <div>
                     <label htmlFor="email" className={labelBaseStyle}>
-                        E-posta adresi
+                        {locale.emailLabel}
                     </label>
                     <input
                         id="email"
@@ -85,7 +116,7 @@ const Auth: React.FC<AuthProps> = ({ etsyUrl }) => {
 
                 <div>
                     <label htmlFor="password" className={labelBaseStyle}>
-                        Şifre
+                        {locale.passwordLabel}
                     </label>
                      <input
                         id="password"
@@ -105,7 +136,7 @@ const Auth: React.FC<AuthProps> = ({ etsyUrl }) => {
                         disabled={loading}
                         className="w-full flex justify-center py-3 px-4 border border-transparent rounded-full shadow-sm text-sm font-semibold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-4 focus:ring-primary-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {loading ? 'İşleniyor...' : (isLogin ? 'Giriş Yap' : 'Kayıt Ol')}
+                        {loading ? locale.processing : (isLogin ? locale.submitLogin : locale.submitSignup)}
                     </button>
                 </div>
             </form>

@@ -12,11 +12,39 @@ import BlogSection from './BlogSection';
 const BUCKET_NAME = 'proof_images';
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://hwukwjitrnzmlglaukmg.supabase.co';
 
+const EN_CONTENT: SiteContent = {
+    hero: {
+        title: 'Grow your Etsy shop with AI',
+        subtitle: 'Our platform helps Etsy service providers launch proof-driven funnels in minutes.',
+        formPlaceholder: 'Paste your Etsy shop URL',
+        formButton: 'Get Started',
+    },
+    features: {
+        title: 'Everything you need',
+        subtitle: 'Keyword intelligence, conversion widgets and package editors built for Etsy experts.',
+        cards: [
+            { title: 'AI keyword research', description: 'Discover buyer-ready search terms and highlight them in your listings.' },
+            { title: 'Conversion boosters', description: 'Launch social proof and lead capture modals optimized for Etsy services.' },
+            { title: 'Package management', description: 'Edit price tiers, bullet points and feature highlights instantly.' },
+        ],
+    },
+    pricing: {
+        title: 'Flexible Plans',
+        subtitle: 'Choose a plan that matches your service workflow.',
+    },
+    proof: {
+        title: 'Success stories',
+        subtitle: 'Trusted by boutique Etsy agencies across the globe.',
+    },
+};
+
 interface LoginScreenProps {
     siteSettings: SiteSettings | null;
+    language: 'tr' | 'en';
+    onLanguageChange: (lang: 'tr' | 'en') => void;
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings, language, onLanguageChange }) => {
   const [url, setUrl] = useState('');
   const [error, setError] = useState('');
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -169,7 +197,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
     setIsLeadModalOpen(true);
   };
   
-  if (loadingContent || !content) {
+  const displayContent = language === 'en' ? EN_CONTENT : (content || EN_CONTENT);
+
+  if (language === 'tr' && (loadingContent || !content)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50">
         <svg className="animate-spin h-10 w-10 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -196,13 +226,26 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
   return (
     <>
       <div className="min-h-screen bg-slate-50 text-slate-800 font-sans overflow-x-hidden">
+        <div className="fixed top-4 right-4 z-50 flex gap-2">
+            {(['tr', 'en'] as const).map((lang) => (
+                <button
+                    key={lang}
+                    onClick={() => onLanguageChange(lang)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors ${
+                        language === lang ? 'bg-primary-600 text-white border-primary-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                    }`}
+                >
+                    {lang.toUpperCase()}
+                </button>
+            ))}
+        </div>
         {isAuthModalOpen && (
           <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fadeIn">
             <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full relative transform transition-all animate-scaleIn">
               <button onClick={() => setIsAuthModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
-              <Auth etsyUrl={url} />
+              <Auth etsyUrl={url} language={language} />
             </div>
           </div>
         )}
@@ -232,7 +275,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                     )}
                 </div>
                 <button onClick={() => setIsAuthModalOpen(true)} className="px-5 py-2 text-sm font-medium text-primary-600 border border-primary-600 rounded-full hover:bg-primary-50 transition-colors">
-                    Giriş Yap
+                    {language === 'en' ? 'Sign In' : 'Giriş Yap'}
                 </button>
             </div>
         </header>
@@ -241,10 +284,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
             <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-28">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight animate-fadeInUp">
-                        {content.hero.title}
+                        {displayContent.hero.title}
                     </h1>
                     <p className="mt-6 max-w-2xl mx-auto text-lg text-slate-600 animate-fadeInUp" style={{animationDelay: '0.1s'}}>
-                        {content.hero.subtitle}
+                        {displayContent.hero.subtitle}
                     </p>
                     <form onSubmit={handleUrlSubmit} className="mt-8 max-w-xl mx-auto animate-fadeInUp" style={{animationDelay: '0.2s'}}>
                         <div className="flex flex-col sm:flex-row gap-3">
@@ -252,14 +295,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                                 type="url"
                                 value={url}
                                 onChange={(e) => setUrl(e.target.value)}
-                                placeholder={content.hero.formPlaceholder}
+                                placeholder={displayContent.hero.formPlaceholder}
                                 className="flex-grow w-full px-5 py-3.5 text-base bg-white border border-slate-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
                             />
                             <button
                                 type="submit"
                                 className="px-8 py-3.5 text-base font-semibold text-white bg-primary-600 rounded-full hover:bg-primary-700 transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                             >
-                                {content.hero.formButton}
+                                {displayContent.hero.formButton}
                             </button>
                         </div>
                         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
@@ -276,8 +319,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
             {proofImages.length > 0 && (
                  <section className="py-20 bg-slate-50 overflow-hidden">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                         <h2 className="text-center text-3xl font-extrabold text-slate-900 tracking-tight">{content.proof.title}</h2>
-                         <p className="text-center text-slate-500 mt-4 max-w-2xl mx-auto text-lg">{content.proof.subtitle}</p>
+                         <h2 className="text-center text-3xl font-extrabold text-slate-900 tracking-tight">{displayContent.proof.title}</h2>
+                         <p className="text-center text-slate-500 mt-4 max-w-2xl mx-auto text-lg">{displayContent.proof.subtitle}</p>
                     </div>
                     <div className="mt-12">
                         <div className="flex animate-marquee-slow">
@@ -294,11 +337,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
             <section className="py-20 lg:py-28 bg-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
-                        <h2 className="text-3xl font-bold text-slate-900">{content.pricing.title}</h2>
-                        <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600">{content.pricing.subtitle}</p>
+                        <h2 className="text-3xl font-bold text-slate-900">{displayContent.pricing.title}</h2>
+                        <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600">{displayContent.pricing.subtitle}</p>
                     </div>
                     <div className="mt-16 max-w-5xl mx-auto">
-                        <PricingSection onPayClick={handlePayClick} />
+                        <PricingSection onPayClick={handlePayClick} language={language} />
                     </div>
                 </div>
             </section>
@@ -306,12 +349,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
             <section className="py-20 lg:py-28 bg-slate-100">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center">
-                        <h2 className="text-base font-semibold text-primary-600 tracking-wider uppercase">Özellikler</h2>
-                        <p className="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">{content.features.title}</p>
-                        <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-500">{content.features.subtitle}</p>
+                        <h2 className="text-base font-semibold text-primary-600 tracking-wider uppercase">
+                            {language === 'en' ? 'Features' : 'Özellikler'}
+                        </h2>
+                        <p className="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">{displayContent.features.title}</p>
+                        <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-500">{displayContent.features.subtitle}</p>
                     </div>
                     <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {content.features.cards.map((feature, index) => (
+                        {displayContent.features.cards.map((feature, index) => (
                             <div key={index} className="bg-white p-6 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-2xl hover:-translate-y-2 border border-slate-200/80">
                                 <div className="flex-shrink-0 w-12 h-12 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center">
                                     {featureIcons[index % featureIcons.length]}
