@@ -98,6 +98,7 @@ export interface SiteSettings {
   stripe_checkout_url?: string | null;
   favicon_url?: string | null;
   footer_text?: string | null;
+  blog_topic?: string | null;
 }
 
 export interface BlogPost {

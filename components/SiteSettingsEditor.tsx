@@ -38,8 +38,9 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                         page_title: data.page_title || data.site_name || 'Etsy Admin',
                         favicon_url: data.favicon_url || null,
                         footer_text: data.footer_text || '',
+                        blog_topic: data.blog_topic || '',
                     }
-                    : { site_name: 'Etsy Admin', logo_url: null, page_title: 'Etsy Admin', favicon_url: null, footer_text: '' };
+                    : { site_name: 'Etsy Admin', logo_url: null, page_title: 'Etsy Admin', favicon_url: null, footer_text: '', blog_topic: '' };
                 setSettings(normalized);
             }
             setLoading(false);
@@ -168,6 +169,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                 page_title: settings.page_title || settings.site_name,
                 favicon_url: settings.favicon_url,
                 footer_text: settings.footer_text || '',
+                blog_topic: settings.blog_topic || '',
             })
             .eq('id', 1);
 
@@ -245,7 +247,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                         </div>
                     </div>
                 </div>
-
+                
                 <div>
                     <label className={labelBaseStyle}>Favicon</label>
                 <div className="flex items-center gap-4 p-3 border border-slate-200 rounded-lg">
@@ -272,6 +274,19 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                             )}
                         </div>
                     </div>
+                </div>
+                
+                <div>
+                    <label htmlFor="blog_topic" className={labelBaseStyle}>AI Blog Konu Başlığı</label>
+                    <textarea
+                        id="blog_topic"
+                        name="blog_topic"
+                        value={settings.blog_topic || ''}
+                        onChange={(e) => setSettings({ ...settings, blog_topic: e.target.value })}
+                        className={`${inputBaseStyle} min-h-[80px]`}
+                        placeholder="Örn: Etsy mağazamız için hizmet tanıtım yazıları"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Buraya girilen konu otomatik blog üretim scriptine aktarılır.</p>
                 </div>
                 
                 <div>

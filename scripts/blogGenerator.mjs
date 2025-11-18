@@ -18,7 +18,16 @@ if (!GEMINI_API_KEY) {
   process.exit(1);
 }
 
-const topic = process.argv[2] || BLOG_TOPIC;
+const fetchTopicFromSettings = async () => {
+  const { data, error } = await supabase.from('site_settings').select('blog_topic').eq('id', 1).maybeSingle();
+  if (error) throw error;
+  return data?.blog_topic;
+};
+
+let topic = process.argv[2] || BLOG_TOPIC;
+if (!topic) {
+  topic = await fetchTopicFromSettings();
+}
 if (!topic) {
   console.error('Konu belirtilmedi. Komutu `node scripts/blogGenerator.mjs "konu"` şeklinde çalıştırın veya BLOG_TOPIC değişkenini ayarlayın.');
   process.exit(1);
