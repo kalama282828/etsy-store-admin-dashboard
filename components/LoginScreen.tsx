@@ -7,6 +7,7 @@ import { SiteContent, ConversionSettings, Package, FileObject, SiteSettings } fr
 import { supabase } from '../lib/supabase';
 import SocialProofNotification from './SocialProofNotification';
 import TurkeyMap from './ActiveSubscriptionsBooster';
+import BlogSection from './BlogSection';
 
 const BUCKET_NAME = 'proof_images';
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://hwukwjitrnzmlglaukmg.supabase.co';
@@ -322,6 +323,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                     </div>
                 </div>
             </section>
+            <BlogSection />
         </main>
       </div>
     </>

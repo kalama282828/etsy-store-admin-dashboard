@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "blog:generate": "node scripts/blogGenerator.mjs",
+    "sitemap": "node scripts/generateSitemap.mjs"
   },
   "dependencies": {
     "react-dom": "^19.2.0",

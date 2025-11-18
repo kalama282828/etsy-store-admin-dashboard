@@ -99,3 +99,14 @@ export interface SiteSettings {
   favicon_url?: string | null;
   footer_text?: string | null;
 }
+
+export interface BlogPost {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  hero_image?: string | null;
+  published_at: string;
+  tags?: string[];
+}

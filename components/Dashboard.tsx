@@ -17,6 +17,7 @@ import SparklesIcon from './icons/SparklesIcon';
 import SiteSettingsEditor from './SiteSettingsEditor';
 import StripeSettings from './StripeSettings';
 import CreditCardIcon from './icons/CreditCardIcon';
+import BlogManager from './BlogManager';
 
 interface DashboardProps {
     siteSettings: SiteSettings | null;
@@ -82,6 +83,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                         </div>
                         <ProofEditor />
                         <LeadsTable leads={leads} onRefresh={fetchData} />
+                        <BlogManager />
                         <UserTable users={registeredUsers} />
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             <div className="lg:col-span-2">
