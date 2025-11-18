@@ -141,20 +141,24 @@ const App: React.FC = () => {
 
   if (!session) {
     return (
-      <>
-        <LoginScreen siteSettings={siteSettings} />
+      <div className="min-h-screen flex flex-col bg-slate-50">
+        <div className="flex-1">
+          <LoginScreen siteSettings={siteSettings} />
+        </div>
         <Footer text={siteSettings?.footer_text} />
-      </>
+      </div>
     );
   }
   
   return (
-    <>
-      {isAdmin 
-        ? <Dashboard siteSettings={siteSettings} onSettingsUpdate={fetchSiteSettings} /> 
-        : <UserDashboard user={session.user} siteSettings={siteSettings} />}
+    <div className="min-h-screen flex flex-col bg-slate-100">
+      <div className="flex-1">
+        {isAdmin 
+          ? <Dashboard siteSettings={siteSettings} onSettingsUpdate={fetchSiteSettings} /> 
+          : <UserDashboard user={session.user} siteSettings={siteSettings} />}
+      </div>
       <Footer text={siteSettings?.footer_text} />
-    </>
+    </div>
   );
 };
 
