@@ -8,10 +8,8 @@ interface LiveChatWidgetProps {
     label?: string;
     role?: 'admin' | 'user' | 'visitor';
     counterpartId?: string;
-    onUnreadChange?: (hasUnread: boolean) => void;
-    mode?: 'floating' | 'panel';
-    triggerLabel?: string;
-    onClose?: () => void;
+    welcomeMessage?: string;
+    onUnreadCountChange?: (count: number) => void;
 }
 
 interface UserMessage {
@@ -30,19 +28,32 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
     role = 'user',
     counterpartId,
     onUnreadChange,
+    onUnreadCountChange,
     mode = 'floating',
     triggerLabel,
     onClose,
+    welcomeMessage,
 }) => {
     const [open, setOpen] = useState(mode === 'panel');
     const [messages, setMessages] = useState<UserMessage[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
-    const [hasUnread, setHasUnread] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
     const [statusOnline, setStatusOnline] = useState<boolean | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const isOpen = mode === 'panel' ? true : open;
+
+    const getWelcomeMessageObj = (): UserMessage | null => {
+        if (!welcomeMessage) return null;
+        return {
+            id: -1,
+            user_email: conversationId,
+            message: welcomeMessage,
+            sent_by: counterpartId || 'admin', // Treat as received from admin
+            created_at: new Date().toISOString(),
+        };
+    };
 
     const fetchMessages = async () => {
         const { data, error } = await supabase
@@ -50,9 +61,23 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
             .select('*')
             .eq('user_email', conversationId)
             .order('created_at', { ascending: true });
-        if (!error && data) {
-            setMessages(data as UserMessage[]);
+
+        let msgs = (data as UserMessage[]) || [];
+
+        const welcomeMsg = getWelcomeMessageObj();
+        if (welcomeMsg) {
+            // Only add welcome message if it's not already in the DB (simple check)
+            // or just always prepend it for display if the chat is empty?
+            // Let's prepend it if the chat is empty OR if we want it always visible at the start.
+            // Usually welcome messages are transient or persisted. 
+            // For now, let's prepend it if the list is empty or just purely visual.
+            // If we prepend it, it might look like a duplicate if we save it later.
+            // Let's just prepend it purely for display.
+            if (msgs.length === 0) {
+                msgs = [welcomeMsg];
+            }
         }
+        setMessages(msgs);
     };
 
     useEffect(() => {
@@ -64,7 +89,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
                     const msg = payload.new as UserMessage;
                     setMessages((prev) => [...prev, msg]);
                     if (msg.sent_by !== senderId && !isOpen) {
-                        setHasUnread(true);
+                        setUnreadCount(prev => prev + 1);
                     }
                 }
             })
@@ -81,11 +106,12 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
     }, [messages, isOpen]);
 
     useEffect(() => {
-        if (isOpen && hasUnread) {
-            setHasUnread(false);
+        if (isOpen && unreadCount > 0) {
+            setUnreadCount(0);
         }
-        onUnreadChange?.(hasUnread);
-    }, [hasUnread, isOpen, onUnreadChange]);
+        onUnreadChange?.(unreadCount > 0);
+        onUnreadCountChange?.(unreadCount);
+    }, [unreadCount, isOpen, onUnreadChange, onUnreadCountChange]);
 
     const markPresence = async (online: boolean) => {
         await supabase
@@ -206,7 +232,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
                     className="relative bg-primary-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-primary-700 transition-colors text-sm font-semibold"
                 >
                     {triggerLabel || label}
-                    {hasUnread && <span className="absolute -top-2 -right-2 h-3 w-3 rounded-full bg-red-500 animate-pulse" />}
+                    {unreadCount > 0 && <span className="absolute -top-2 -right-2 h-3 w-3 rounded-full bg-red-500 animate-pulse" />}
                 </button>
             )}
             {isOpen && chatBody}

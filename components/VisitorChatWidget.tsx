@@ -11,7 +11,9 @@ const VisitorChatWidget: React.FC<VisitorChatWidgetProps> = ({ language }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [hasProfile, setHasProfile] = useState(false);
-    const [hasUnread, setHasUnread] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    const WELCOME_MESSAGE = "Merhabalar, ETSY Sıralama hizmeti veren hizmetimizi tanıtmaktan memnuniyet duyarım! Lütfen hemen bize mesaj atın ve birlikte mağazanızı analiz edelim";
 
     useEffect(() => {
         const storedName = localStorage.getItem('visitor_name');
@@ -19,6 +21,9 @@ const VisitorChatWidget: React.FC<VisitorChatWidgetProps> = ({ language }) => {
         if (storedEmail) {
             setEmail(storedEmail);
             setHasProfile(true);
+        } else {
+            // New visitor, show 1 unread message (welcome message)
+            setUnreadCount(1);
         }
         if (storedName) {
             setName(storedName);
@@ -41,7 +46,11 @@ const VisitorChatWidget: React.FC<VisitorChatWidgetProps> = ({ language }) => {
                     className="relative bg-primary-600 text-white px-4 py-2 rounded-full shadow-lg hover:bg-primary-700 transition-colors text-sm font-semibold"
                 >
                     {language === 'en' ? 'Live Support' : 'Canlı Destek'}
-                    {hasUnread && <span className="absolute -top-2 -right-2 h-3 w-3 rounded-full bg-red-500 animate-pulse" />}
+                    {unreadCount > 0 && (
+                        <span className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center rounded-full bg-red-500 text-white text-xs font-bold animate-pulse">
+                            {unreadCount}
+                        </span>
+                    )}
                 </button>
             )}
             {open && (
@@ -58,7 +67,18 @@ const VisitorChatWidget: React.FC<VisitorChatWidgetProps> = ({ language }) => {
                                 </svg>
                             </button>
                         </div>
-                        <form onSubmit={handleStart} className="p-4 space-y-3 text-sm text-slate-700">
+
+                        {/* Welcome Message Bubble */}
+                        <div className="p-4 bg-slate-50 flex-1 overflow-y-auto">
+                            <div className="flex justify-start mb-4">
+                                <div className="max-w-[90%] px-3 py-2 rounded-2xl text-sm bg-slate-100 text-slate-700 shadow-sm border border-slate-200">
+                                    <p>{WELCOME_MESSAGE}</p>
+                                    <span className="text-[10px] text-slate-500 block mt-1">Az önce</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleStart} className="p-4 pt-2 border-t border-slate-100 space-y-3 text-sm text-slate-700 bg-white">
                             <div>
                                 <label className="block mb-1">{language === 'en' ? 'Your name' : 'Adınız'}</label>
                                 <input
@@ -93,8 +113,9 @@ const VisitorChatWidget: React.FC<VisitorChatWidgetProps> = ({ language }) => {
                             counterpartId={ADMIN_CHAT_ID}
                             role="visitor"
                             label={language === 'en' ? 'Support' : 'Destek'}
-                            onUnreadChange={setHasUnread}
+                            onUnreadCountChange={setUnreadCount}
                             onClose={() => setOpen(false)}
+                            welcomeMessage={WELCOME_MESSAGE}
                         />
                     </div>
                 )
