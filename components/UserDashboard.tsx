@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { Package, SiteSettings, Lead } from '../types';
+import LiveChatWidget from './LiveChatWidget';
 
 interface UserDashboardProps {
     user: User;
@@ -357,6 +358,9 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                             <span className="text-sm font-medium text-slate-700">Bilgiler yükleniyor...</span>
                         </div>
                     </div>
+                )}
+                {!loading && (
+                    <LiveChatWidget user={{ id: user.id, email: user.email || '', etsy_store_url: user.user_metadata?.etsy_store_url || '', created_at: user.created_at }} />
                 )}
             </main>
         </div>
