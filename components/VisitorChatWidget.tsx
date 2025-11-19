@@ -45,19 +45,19 @@ const VisitorChatWidget: React.FC<VisitorChatWidgetProps> = ({ language }) => {
                 </button>
             )}
             {open && (
-                <div className="w-80 h-96 bg-white rounded-2xl shadow-2xl flex flex-col">
-                    <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
-                        <div>
-                            <p className="text-sm font-semibold text-slate-900">{language === 'en' ? 'Live Support' : 'Canlı Destek'}</p>
-                            <p className="text-xs text-slate-500">{language === 'en' ? 'We reply in a few minutes' : 'Birkaç dakika içinde yanıtlıyoruz'}</p>
+                !hasProfile ? (
+                    <div className="w-80 h-96 bg-white rounded-2xl shadow-2xl flex flex-col">
+                        <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-semibold text-slate-900">{language === 'en' ? 'Live Support' : 'Canlı Destek'}</p>
+                                <p className="text-xs text-slate-500">{language === 'en' ? 'We reply in a few minutes' : 'Birkaç dakika içinde yanıtlıyoruz'}</p>
+                            </div>
+                            <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
-                        <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    {!hasProfile ? (
                         <form onSubmit={handleStart} className="p-4 space-y-3 text-sm text-slate-700">
                             <div>
                                 <label className="block mb-1">{language === 'en' ? 'Your name' : 'Adınız'}</label>
@@ -82,21 +82,22 @@ const VisitorChatWidget: React.FC<VisitorChatWidgetProps> = ({ language }) => {
                                 {language === 'en' ? 'Start Chat' : 'Sohbeti Başlat'}
                             </button>
                         </form>
-                    ) : (
-                        <div className="flex-1">
-                            <LiveChatWidget
-                                mode="panel"
-                                conversationId={email}
-                                senderId={email}
-                                displayName={name || email}
-                                counterpartId={ADMIN_CHAT_ID}
-                                role="visitor"
-                                label={language === 'en' ? 'Support' : 'Destek'}
-                                onUnreadChange={setHasUnread}
-                            />
-                        </div>
-                    )}
-                </div>
+                    </div>
+                ) : (
+                    <div className="w-80 h-96">
+                        <LiveChatWidget
+                            mode="panel"
+                            conversationId={email}
+                            senderId={email}
+                            displayName={name || email}
+                            counterpartId={ADMIN_CHAT_ID}
+                            role="visitor"
+                            label={language === 'en' ? 'Support' : 'Destek'}
+                            onUnreadChange={setHasUnread}
+                            onClose={() => setOpen(false)}
+                        />
+                    </div>
+                )
             )}
         </div>
     );

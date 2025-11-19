@@ -11,6 +11,7 @@ interface LiveChatWidgetProps {
     onUnreadChange?: (hasUnread: boolean) => void;
     mode?: 'floating' | 'panel';
     triggerLabel?: string;
+    onClose?: () => void;
 }
 
 interface UserMessage {
@@ -31,6 +32,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
     onUnreadChange,
     mode = 'floating',
     triggerLabel,
+    onClose,
 }) => {
     const [open, setOpen] = useState(mode === 'panel');
     const [messages, setMessages] = useState<UserMessage[]>([]);
@@ -149,14 +151,14 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
     };
 
     const chatBody = (
-        <div className="w-80 h-96 flex flex-col bg-white rounded-2xl shadow-2xl">
+        <div className="w-full h-full flex flex-col bg-white rounded-2xl shadow-2xl">
             <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
                 <div>
                     <p className="text-sm font-semibold text-slate-900">{label}</p>
                     <p className="text-xs text-slate-500">{statusOnline === null ? 'Durum alınıyor...' : statusOnline ? 'Çevrimiçi' : 'Çevrimdışı'}</p>
                 </div>
-                {mode === 'floating' && (
-                    <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">
+                {(mode === 'floating' || onClose) && (
+                    <button onClick={() => onClose ? onClose() : setOpen(false)} className="text-slate-400 hover:text-slate-600">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
