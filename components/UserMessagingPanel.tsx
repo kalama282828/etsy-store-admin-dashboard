@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { RegisteredUser } from '../types';
 import LiveChatWidget from './LiveChatWidget';
+import { ADMIN_CHAT_ID } from '../constants';
+import { supabase } from '../lib/supabase';
 
 interface UserMessagingPanelProps {
     users: RegisteredUser[];
@@ -8,13 +10,27 @@ interface UserMessagingPanelProps {
 
 const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
     const [selectedEmail, setSelectedEmail] = useState(users[0]?.email || '');
-    const [chatOpen, setChatOpen] = useState(false);
 
     useEffect(() => {
         if (!selectedEmail && users.length > 0) {
             setSelectedEmail(users[0].email);
         }
     }, [users, selectedEmail]);
+
+    useEffect(() => {
+        const markPresence = async (isOnline: boolean) => {
+            await supabase.from('chat_presence').upsert({
+                email: ADMIN_CHAT_ID,
+                role: 'admin',
+                is_online: isOnline,
+                updated_at: new Date().toISOString(),
+            }, { onConflict: 'email' });
+        };
+        markPresence(true);
+        return () => {
+            markPresence(false);
+        };
+    }, []);
 
     if (!users.length) {
         return (
@@ -26,36 +42,37 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
 
     return (
         <div className="bg-white p-6 rounded-2xl shadow-xl">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <div>
-                    <h2 className="text-xl font-bold text-slate-800">Canlı Chat</h2>
-                    <p className="text-sm text-slate-500">Bir kullanıcı seçip pencereyi açtığınızda mesajlaşmaya başlayabilirsiniz.</p>
-                </div>
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <select
-                        value={selectedEmail}
-                        onChange={(e) => setSelectedEmail(e.target.value)}
-                        className="px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
-                    >
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="border border-slate-200 rounded-2xl h-96 overflow-y-auto">
+                    <ul className="divide-y divide-slate-200 text-sm">
                         {users.map((user) => (
-                            <option key={user.id} value={user.email}>
-                                {user.email}
-                            </option>
+                            <li
+                                key={user.id}
+                                className={`px-4 py-3 cursor-pointer ${selectedEmail === user.email ? 'bg-primary-50 text-primary-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'}`}
+                                onClick={() => setSelectedEmail(user.email)}
+                            >
+                                <p>{user.email}</p>
+                                <p className="text-xs text-slate-400">{user.created_at ? new Date(user.created_at).toLocaleDateString('tr-TR') : ''}</p>
+                            </li>
                         ))}
-                    </select>
-                    <button
-                        onClick={() => setChatOpen((prev) => !prev)}
-                        className="px-4 py-2 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
-                    >
-                        {chatOpen ? 'Pencereyi Kapat' : 'Chat Penceresini Aç'}
-                    </button>
+                    </ul>
+                </div>
+                <div className="lg:col-span-2">
+                    {selectedEmail ? (
+                        <LiveChatWidget
+                            mode="panel"
+                            conversationId={selectedEmail}
+                            senderId={ADMIN_CHAT_ID}
+                            displayName="Admin"
+                            counterpartId={selectedEmail}
+                            role="admin"
+                            label={`Chat: ${selectedEmail}`}
+                        />
+                    ) : (
+                        <div className="h-96 flex items-center justify-center text-sm text-slate-500">Bir kullanıcı seçin.</div>
+                    )}
                 </div>
             </div>
-            {chatOpen && selectedEmail && (
-                <div className="mt-4 border border-slate-200 rounded-2xl">
-                    <LiveChatWidget email={selectedEmail} displayName="Admin" label={`Chat: ${selectedEmail}`} />
-                </div>
-            )}
         </div>
     );
 };

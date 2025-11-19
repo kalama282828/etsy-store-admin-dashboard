@@ -3,6 +3,7 @@ import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { Package, SiteSettings, Lead } from '../types';
 import LiveChatWidget from './LiveChatWidget';
+import { ADMIN_CHAT_ID } from '../constants';
 
 interface UserDashboardProps {
     user: User;
@@ -360,7 +361,14 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                     </div>
                 )}
                 {!loading && user.email && (
-                    <LiveChatWidget email={user.email} displayName={user.user_metadata?.full_name || user.email} />
+                    <LiveChatWidget
+                        conversationId={user.email}
+                        senderId={user.email}
+                        displayName={user.user_metadata?.full_name || user.email}
+                        counterpartId={ADMIN_CHAT_ID}
+                        role="user"
+                        label="Canlı Destek"
+                    />
                 )}
             </main>
         </div>

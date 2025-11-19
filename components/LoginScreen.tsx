@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase';
 import SocialProofNotification from './SocialProofNotification';
 import TurkeyMap from './ActiveSubscriptionsBooster';
 import BlogSection from './BlogSection';
+import VisitorChatWidget from './VisitorChatWidget';
 
 const BUCKET_NAME = 'proof_images';
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://hwukwjitrnzmlglaukmg.supabase.co';
@@ -369,6 +370,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings, language, onLan
                 </div>
             </section>
             <BlogSection />
+            <VisitorChatWidget language={language} />
         </main>
       </div>
     </>
