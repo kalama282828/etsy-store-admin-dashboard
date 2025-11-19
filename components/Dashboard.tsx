@@ -85,7 +85,6 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                         </div>
                         <ProofEditor />
                         <LeadsTable leads={leads} onRefresh={fetchData} />
-                        <UserMessagingPanel users={registeredUsers} />
                         <BlogManager />
                         <UserTable users={registeredUsers} />
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -113,6 +112,13 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                         <h1 className="text-3xl font-bold text-slate-900">Blog & AI İçerik</h1>
                         <BlogGeneratorPanel />
                         <BlogManager />
+                    </div>
+                );
+            case 'messages':
+                return (
+                    <div className="space-y-8">
+                        <h1 className="text-3xl font-bold text-slate-900">Mesajlar</h1>
+                        <UserMessagingPanel users={registeredUsers} />
                     </div>
                 );
             default:
@@ -165,6 +171,16 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                         label="Blog / AI"
                         isActive={activeView === 'blog'}
                         onClick={() => setActiveView('blog')}
+                    />
+                    <NavItem
+                        icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M2.25 6.75A2.25 2.25 0 0 1 4.5 4.5h15a2.25 2.25 0 0 1 2.25 2.25v10.5A2.25 2.25 0 0 1 19.5 19.5h-15A2.25 2.25 0 0 1 2.25 17.25V6.75zm2.25-.75a.75.75 0 0 0-.75.75v.305l8.25 5.156 8.25-5.156v-.305a.75.75 0 0 0-.75-.75h-15zm15.75 3.195-7.614 4.764a.75.75 0 0 1-.772 0L4.5 9.195v8.055a.75.75 0 0 0 .75.75h15a.75.75 0 0 0 .75-.75V9.195z" />
+                            </svg>
+                        }
+                        label="Mesajlar"
+                        isActive={activeView === 'messages'}
+                        onClick={() => setActiveView('messages')}
                     />
                 </nav>
             </aside>
