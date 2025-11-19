@@ -149,7 +149,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
     };
 
     const chatBody = (
-        <div className="w-full h-96 flex flex-col bg-white rounded-2xl shadow-2xl">
+        <div className="w-80 h-96 flex flex-col bg-white rounded-2xl shadow-2xl">
             <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
                 <div>
                     <p className="text-sm font-semibold text-slate-900">{label}</p>
