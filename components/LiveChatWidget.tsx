@@ -68,6 +68,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ email, displayName, lab
             });
         if (!error) {
             setInput('');
+            fetchMessages();
         }
         setLoading(false);
     };
