@@ -100,6 +100,8 @@ export interface SiteSettings {
   footer_text?: string | null;
   blog_topic?: string | null;
   gemini_api_key?: string | null;
+  promotion_banner_text?: string | null;
+  promotion_banner_active?: boolean | null;
 }
 
 export interface BlogPost {

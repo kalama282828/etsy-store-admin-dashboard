@@ -14,7 +14,7 @@ import { SiteSettings } from './types';
 // Email: rahimolkam@gmail.com
 // Password: your chosen password during sign-up
 // IMPORTANT: You must first sign up with this email.
-const ADMIN_EMAIL = 'rahimolkam@gmail.com'; 
+const ADMIN_EMAIL = 'rahimolkam@gmail.com';
 
 const SupabaseCredentialsWarning: React.FC = () => {
   return (
@@ -52,45 +52,49 @@ const App: React.FC = () => {
   }
 
   const fetchSiteSettings = async () => {
-      setLoadingSettings(true);
-      const { data, error } = await supabase
-          .from('site_settings')
-          .select('*')
-          .eq('id', 1)
-          .single();
-      
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
-          console.error("Error fetching site settings:", error);
-      } else {
-          const normalized = data
-            ? {
-                ...data,
-                page_title: data.page_title || data.site_name || 'Etsy Store Admin',
-                stripe_publishable_key: data.stripe_publishable_key || '',
-                stripe_secret_key: data.stripe_secret_key || '',
-                stripe_checkout_url: data.stripe_checkout_url || '',
-                favicon_url: data.favicon_url || '',
-                footer_text: data.footer_text || '',
-                blog_topic: data.blog_topic || '',
-                gemini_api_key: data.gemini_api_key || '',
-              }
-            : {
-                site_name: 'Etsy Admin',
-                logo_url: null,
-                page_title: 'Etsy Store Admin',
-                stripe_publishable_key: '',
-                stripe_secret_key: '',
-                stripe_checkout_url: '',
-                favicon_url: '',
-                footer_text: '',
-                blog_topic: '',
-                gemini_api_key: '',
-              };
-          setSiteSettings(normalized);
-      }
-      setLoadingSettings(false);
+    setLoadingSettings(true);
+    const { data, error } = await supabase
+      .from('site_settings')
+      .select('*')
+      .eq('id', 1)
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows found
+      console.error("Error fetching site settings:", error);
+    } else {
+      const normalized = data
+        ? {
+          ...data,
+          page_title: data.page_title || data.site_name || 'Etsy Store Admin',
+          stripe_publishable_key: data.stripe_publishable_key || '',
+          stripe_secret_key: data.stripe_secret_key || '',
+          stripe_checkout_url: data.stripe_checkout_url || '',
+          favicon_url: data.favicon_url || '',
+          footer_text: data.footer_text || '',
+          blog_topic: data.blog_topic || '',
+          gemini_api_key: data.gemini_api_key || '',
+          promotion_banner_text: data.promotion_banner_text || '',
+          promotion_banner_active: data.promotion_banner_active || false,
+        }
+        : {
+          site_name: 'Etsy Admin',
+          logo_url: null,
+          page_title: 'Etsy Store Admin',
+          stripe_publishable_key: '',
+          stripe_secret_key: '',
+          stripe_checkout_url: '',
+          favicon_url: '',
+          footer_text: '',
+          blog_topic: '',
+          gemini_api_key: '',
+          promotion_banner_text: '',
+          promotion_banner_active: false,
+        };
+      setSiteSettings(normalized);
+    }
+    setLoadingSettings(false);
   };
-  
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -144,18 +148,18 @@ const App: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50">
         <div className="flex-1">
-        <LoginScreen siteSettings={siteSettings} language={language} onLanguageChange={setLanguage} />
+          <LoginScreen siteSettings={siteSettings} language={language} onLanguageChange={setLanguage} />
         </div>
         <Footer text={siteSettings?.footer_text} />
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-100">
       <div className="flex-1">
-        {isAdmin 
-          ? <Dashboard siteSettings={siteSettings} onSettingsUpdate={fetchSiteSettings} /> 
+        {isAdmin
+          ? <Dashboard siteSettings={siteSettings} onSettingsUpdate={fetchSiteSettings} />
           : <UserDashboard user={session.user} siteSettings={siteSettings} />}
       </div>
       <Footer text={siteSettings?.footer_text} />

@@ -9,6 +9,7 @@ import SocialProofNotification from './SocialProofNotification';
 import TurkeyMap from './ActiveSubscriptionsBooster';
 import BlogSection from './BlogSection';
 import VisitorChatWidget from './VisitorChatWidget';
+import PromotionBanner from './PromotionBanner';
 
 const BUCKET_NAME = 'proof_images';
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://hwukwjitrnzmlglaukmg.supabase.co';
@@ -227,6 +228,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings, language, onLan
     return (
         <>
             <div className="min-h-screen bg-slate-50 text-slate-800 font-sans overflow-x-hidden">
+                <PromotionBanner text={siteSettings?.promotion_banner_text} isActive={siteSettings?.promotion_banner_active} />
                 <div className="fixed bottom-6 left-6 z-50 flex gap-2">
                     {(['tr', 'en'] as const).map((lang) => (
                         <button
@@ -260,7 +262,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings, language, onLan
 
                 <SocialProofNotification message={notificationMessage} />
 
-                <header className="absolute top-0 left-0 right-0 z-10 py-6 px-4 sm:px-6 lg:px-8">
+                <header
+                    className="absolute left-0 right-0 z-10 py-6 px-4 sm:px-6 lg:px-8 transition-all duration-300"
+                    style={{ top: siteSettings?.promotion_banner_active ? '44px' : '0' }}
+                >
                     <div className="max-w-7xl mx-auto flex justify-between items-center">
                         <div className="flex items-center space-x-2">
                             {siteSettings?.logo_url ? (
