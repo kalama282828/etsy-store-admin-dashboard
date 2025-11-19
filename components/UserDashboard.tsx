@@ -359,8 +359,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                         </div>
                     </div>
                 )}
-                {!loading && (
-                    <LiveChatWidget user={{ id: user.id, email: user.email || '', etsy_store_url: user.user_metadata?.etsy_store_url || '', created_at: user.created_at }} />
+                {!loading && user.email && (
+                    <LiveChatWidget email={user.email} displayName={user.user_metadata?.full_name || user.email} />
                 )}
             </main>
         </div>

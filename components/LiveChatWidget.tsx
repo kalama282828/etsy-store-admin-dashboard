@@ -3,7 +3,9 @@ import { supabase } from '../lib/supabase';
 import { RegisteredUser } from '../types';
 
 interface LiveChatWidgetProps {
-    user: RegisteredUser;
+    email: string;
+    displayName?: string;
+    label?: string;
 }
 
 interface UserMessage {
@@ -14,7 +16,7 @@ interface UserMessage {
     created_at: string;
 }
 
-const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ user }) => {
+const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ email, displayName, label }) => {
     const [open, setOpen] = useState(false);
     const [messages, setMessages] = useState<UserMessage[]>([]);
     const [input, setInput] = useState('');
@@ -25,7 +27,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ user }) => {
         const { data, error } = await supabase
             .from('user_messages')
             .select('*')
-            .eq('user_email', user.email)
+            .eq('user_email', email)
             .order('created_at', { ascending: true });
 
         if (!error && data) {
@@ -36,15 +38,15 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ user }) => {
     useEffect(() => {
         fetchMessages();
         const channel = supabase
-            .channel('live-chat')
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'user_messages', filter: `user_email=eq.${user.email}` }, () => {
+            .channel(`live-chat-${email}`)
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'user_messages', filter: `user_email=eq.${email}` }, () => {
                 fetchMessages();
             })
             .subscribe();
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [user.email]);
+    }, [email]);
 
     useEffect(() => {
         if (open && messagesEndRef.current) {
@@ -60,9 +62,9 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ user }) => {
         const { error } = await supabase
             .from('user_messages')
             .insert({
-                user_email: user.email,
+                user_email: email,
                 message: input.trim(),
-                sent_by: user.email,
+                sent_by: displayName || email,
             });
         if (!error) {
             setInput('');
@@ -84,8 +86,8 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ user }) => {
                 <div className="w-80 h-96 bg-white rounded-2xl shadow-2xl flex flex-col">
                     <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-semibold text-slate-900">Canlı Destek</p>
-                            <p className="text-xs text-slate-500">Yanıtlama süresi: 2-5 dk</p>
+                            <p className="text-sm font-semibold text-slate-900">{label || 'Canlı Destek'}</p>
+                            <p className="text-xs text-slate-500">{displayName ? displayName : email}</p>
                         </div>
                         <button onClick={() => setOpen(false)} className="text-slate-400 hover:text-slate-600">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,9 +96,9 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({ user }) => {
                         </button>
                     </div>
                     <div className="flex-1 px-4 py-3 overflow-y-auto space-y-3">
-                        {messages.map((msg) => (
-                            <div key={msg.id} className={`flex ${msg.sent_by === user.email ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${msg.sent_by === user.email ? 'bg-primary-100 text-primary-900' : 'bg-slate-100 text-slate-700'}`}>
+                {messages.map((msg) => (
+                    <div key={msg.id} className={`flex ${msg.sent_by === email ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${msg.sent_by === email ? 'bg-primary-100 text-primary-900' : 'bg-slate-100 text-slate-700'}`}>
                                     <p>{msg.message}</p>
                                     <span className="text-[10px] text-slate-500 block mt-1">{new Date(msg.created_at).toLocaleTimeString('tr-TR')}</span>
                                 </div>
