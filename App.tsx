@@ -75,6 +75,7 @@ const App: React.FC = () => {
           blog_topic: data.blog_topic || '',
           gemini_api_key: data.gemini_api_key || '',
           promotion_banner_text: data.promotion_banner_text || '',
+          promotion_banner_text_en: data.promotion_banner_text_en || '',
           promotion_banner_active: data.promotion_banner_active || false,
         }
         : {

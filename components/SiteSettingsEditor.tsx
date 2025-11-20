@@ -40,6 +40,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                         footer_text: data.footer_text || '',
                         blog_topic: data.blog_topic || '',
                         promotion_banner_text: data.promotion_banner_text || '',
+                        promotion_banner_text_en: data.promotion_banner_text_en || '',
                         promotion_banner_active: data.promotion_banner_active || false,
                     }
                     : {
@@ -50,6 +51,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                         footer_text: '',
                         blog_topic: '',
                         promotion_banner_text: '',
+                        promotion_banner_text_en: '',
                         promotion_banner_active: false
                     };
                 setSettings(normalized);
@@ -187,6 +189,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                 footer_text: settings.footer_text || '',
                 blog_topic: settings.blog_topic || '',
                 promotion_banner_text: settings.promotion_banner_text,
+                promotion_banner_text_en: settings.promotion_banner_text_en,
                 promotion_banner_active: settings.promotion_banner_active,
             })
             .eq('id', 1);
@@ -324,6 +327,19 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                                 className={inputBaseStyle}
                             />
                             <p className="text-xs text-slate-500 mt-1">Bu metin sitenin en üstünde kayan yazı olarak görünecektir.</p>
+                        </div>
+
+                        <div>
+                            <label htmlFor="promotion_banner_text_en" className={labelBaseStyle}>Banner Metni (İngilizce)</label>
+                            <input
+                                id="promotion_banner_text_en"
+                                name="promotion_banner_text_en"
+                                value={settings.promotion_banner_text_en || ''}
+                                onChange={handleInputChange}
+                                placeholder="Ex: 20% Discount Opportunity!"
+                                className={inputBaseStyle}
+                            />
+                            <p className="text-xs text-slate-500 mt-1">İngilizce dil seçeneğinde görünecek metin.</p>
                         </div>
                     </div>
                 </div>

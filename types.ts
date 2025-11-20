@@ -101,6 +101,7 @@ export interface SiteSettings {
   blog_topic?: string | null;
   gemini_api_key?: string | null;
   promotion_banner_text?: string | null;
+  promotion_banner_text_en?: string | null;
   promotion_banner_active?: boolean | null;
 }
 

@@ -229,7 +229,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
     return (
         <>
             <div className="min-h-screen bg-slate-50 text-slate-800 font-sans overflow-x-hidden">
-                <PromotionBanner text={siteSettings?.promotion_banner_text} isActive={siteSettings?.promotion_banner_active} />
+                <PromotionBanner
+                    text={language === 'en' ? (siteSettings?.promotion_banner_text_en || siteSettings?.promotion_banner_text) : siteSettings?.promotion_banner_text}
+                    isActive={siteSettings?.promotion_banner_active}
+                />
                 <div className="fixed bottom-6 left-6 z-50 flex gap-2">
                     {(['tr', 'en'] as const).map((lang) => (
                         <button
