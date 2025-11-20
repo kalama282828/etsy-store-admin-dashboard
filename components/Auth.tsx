@@ -61,6 +61,14 @@ const Auth: React.FC<AuthProps> = ({ etsyUrl, language = 'tr' }) => {
                 if (error) throw error;
                 // The onAuthStateChange listener in App.tsx will handle the redirect.
             } else {
+                // Validate Etsy Shop URL
+                const etsyRegex = /etsy\.com\/([a-z]{2}\/)?shop\/[a-zA-Z0-9_-]+/i;
+                if (!etsyRegex.test(shopUrl)) {
+                    setMessage({ type: 'error', text: 'Lütfen geçerli bir Etsy mağaza linki giriniz (örn: etsy.com/shop/magazaniz).' });
+                    setLoading(false);
+                    return;
+                }
+
                 const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
