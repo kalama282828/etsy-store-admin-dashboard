@@ -40,13 +40,14 @@ const EN_CONTENT: SiteContent = {
     },
 };
 
+import { useLanguage } from './LanguageContext';
+
 interface LoginScreenProps {
     siteSettings: SiteSettings | null;
-    language: 'tr' | 'en';
-    onLanguageChange: (lang: 'tr' | 'en') => void;
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings, language, onLanguageChange }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
+    const { language, setLanguage } = useLanguage();
     const [url, setUrl] = useState('');
     const [error, setError] = useState('');
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -233,7 +234,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings, language, onLan
                     {(['tr', 'en'] as const).map((lang) => (
                         <button
                             key={lang}
-                            onClick={() => onLanguageChange(lang)}
+                            onClick={() => setLanguage(lang)}
                             className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors ${language === lang ? 'bg-primary-600 text-white border-primary-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
                                 }`}
                         >

@@ -21,12 +21,15 @@ import BlogManager from './BlogManager';
 import BlogGeneratorPanel from './BlogGeneratorPanel';
 import UserMessagingPanel from './UserMessagingPanel';
 
+import { useLanguage } from './LanguageContext';
+
 interface DashboardProps {
     siteSettings: SiteSettings | null;
     onSettingsUpdate: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate }) => {
+    const { t } = useLanguage();
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
     const [leads, setLeads] = useState<Lead[]>([]);
@@ -79,10 +82,10 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
 
             // Refresh the user list
             fetchData();
-            alert('Kullanıcı başarıyla silindi.');
+            alert(t('success'));
         } catch (err: any) {
             console.error('Kullanıcı silinirken hata:', err);
-            alert(`Kullanıcı silinemedi: ${err.message}`);
+            alert(`${t('error')}: ${err.message}`);
         }
     };
 
@@ -91,7 +94,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
             case 'dashboard':
                 return (
                     <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-slate-900">Tekrar hoş geldin, Admin!</h1>
+                        <h1 className="text-3xl font-bold text-slate-900">{t('dashboard_welcome')}</h1>
                         <StatsCards customers={customers} />
                         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                             <ContentEditor />
@@ -116,14 +119,14 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
             case 'stripe':
                 return (
                     <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-slate-900">Stripe Entegrasyonu</h1>
+                        <h1 className="text-3xl font-bold text-slate-900">{t('dashboard_stripe_title')}</h1>
                         <StripeSettings />
                     </div>
                 );
             case 'blog':
                 return (
                     <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-slate-900">Blog & AI İçerik</h1>
+                        <h1 className="text-3xl font-bold text-slate-900">{t('dashboard_blog_title')}</h1>
                         <BlogGeneratorPanel />
                         <BlogManager />
                     </div>
@@ -131,7 +134,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
             case 'messages':
                 return (
                     <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-slate-900">Mesajlar</h1>
+                        <h1 className="text-3xl font-bold text-slate-900">{t('dashboard_messages_title')}</h1>
                         <UserMessagingPanel users={registeredUsers} />
                     </div>
                 );
@@ -153,26 +156,26 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                                 <path fillRule="evenodd" d="M3 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3.293 8.293a1 1 0 011.414 0L6 9.586V14a1 1 0 11-2 0V9.586L2.293 7.707a1 1 0 010-1.414zM11 14V9.586L12.293 8.293a1 1 0 111.414 1.414L12 11.414V14a1 1 0 11-2 0zM7 14V9.586l-1.707-1.707a1 1 0 00-1.414 1.414L6 11.414V14a1 1 0 102 0zm5 0V9.586l1.707-1.707a1 1 0 10-1.414-1.414L12 11.414V14a1 1 0 102 0z" clipRule="evenodd" />
                                 <path d="M4 16a1 1 0 100 2h12a1 1 0 100-2H4z" />
                             </svg>
-                            <span className="text-xl font-bold text-slate-800">{siteSettings?.site_name || 'Yönetim'}</span>
+                            <span className="text-xl font-bold text-slate-800">{siteSettings?.site_name || t('site_name_default')}</span>
                         </>
                     )}
                 </div>
                 <nav className="p-4 space-y-2 flex-1">
                     <NavItem
                         icon={<LayoutDashboardIcon />}
-                        label="Yönetim Paneli"
+                        label={t('dashboard_menu_dashboard')}
                         isActive={activeView === 'dashboard'}
                         onClick={() => setActiveView('dashboard')}
                     />
                     <NavItem
                         icon={<SparklesIcon />}
-                        label="Dönüşüm Arttırıcı"
+                        label={t('dashboard_menu_booster')}
                         isActive={activeView === 'booster'}
                         onClick={() => setActiveView('booster')}
                     />
                     <NavItem
                         icon={<CreditCardIcon />}
-                        label="Stripe Ayarları"
+                        label={t('dashboard_menu_stripe')}
                         isActive={activeView === 'stripe'}
                         onClick={() => setActiveView('stripe')}
                     />
@@ -182,7 +185,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                                 <path d="M4 5h16a1 1 0 011 1v9a1 1 0 01-1 1h-7v2h5a1 1 0 110 2H8a1 1 0 110-2h5v-2H4a1 1 0 01-1-1V6a1 1 0 011-1zm1 9h14V7H5v7z" />
                             </svg>
                         }
-                        label="Blog / AI"
+                        label={t('dashboard_menu_blog')}
                         isActive={activeView === 'blog'}
                         onClick={() => setActiveView('blog')}
                     />
@@ -192,7 +195,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                                 <path d="M2.25 6.75A2.25 2.25 0 0 1 4.5 4.5h15a2.25 2.25 0 0 1 2.25 2.25v10.5A2.25 2.25 0 0 1 19.5 19.5h-15A2.25 2.25 0 0 1 2.25 17.25V6.75zm2.25-.75a.75.75 0 0 0-.75.75v.305l8.25 5.156 8.25-5.156v-.305a.75.75 0 0 0-.75-.75h-15zm15.75 3.195-7.614 4.764a.75.75 0 0 1-.772 0L4.5 9.195v8.055a.75.75 0 0 0 .75.75h15a.75.75 0 0 0 .75-.75V9.195z" />
                             </svg>
                         }
-                        label="Mesajlar"
+                        label={t('dashboard_menu_messages')}
                         isActive={activeView === 'messages'}
                         onClick={() => setActiveView('messages')}
                     />
@@ -207,13 +210,13 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <p className="mt-2 text-slate-600">Veriler yükleniyor...</p>
+                            <p className="mt-2 text-slate-600">{t('dashboard_loading')}</p>
                         </div>
                     )}
 
                     {error && (
                         <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6" role="alert">
-                            <p className="font-bold">Veri Alınırken Hata Oluştu</p>
+                            <p className="font-bold">{t('dashboard_error_title')}</p>
                             <p>{error}</p>
                         </div>
                     )}

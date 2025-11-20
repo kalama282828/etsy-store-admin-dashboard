@@ -3,6 +3,7 @@ import { Lead } from '../types';
 import { supabase } from '../lib/supabase';
 import DeleteIcon from './icons/DeleteIcon';
 import AdminLeadFormModal from './AdminLeadFormModal';
+import { useLanguage } from './LanguageContext';
 
 interface LeadsTableProps {
     leads: Lead[];
@@ -10,6 +11,7 @@ interface LeadsTableProps {
 }
 
 const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
+    const { t, language } = useLanguage();
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [downloading, setDownloading] = useState(false);
@@ -21,17 +23,17 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
     ), [leads, searchTerm]);
 
     const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleString('tr-TR', {
+        return new Date(dateString).toLocaleString(language === 'tr' ? 'tr-TR' : 'en-US', {
             year: 'numeric', month: 'long', day: 'numeric',
             hour: '2-digit', minute: '2-digit'
         });
     };
 
     const handleDelete = async (leadId: number) => {
-        if (!window.confirm('Bu lead kaydını silmek istediğinizden emin misiniz?')) return;
+        if (!window.confirm(language === 'tr' ? 'Bu lead kaydını silmek istediğinizden emin misiniz?' : 'Are you sure you want to delete this lead?')) return;
         const { error } = await supabase.from('leads').delete().eq('id', leadId);
         if (error) {
-            alert(`Lead silinirken bir hata oluştu: ${error.message}`);
+            alert(`${t('error')}: ${error.message}`);
         } else {
             onRefresh?.();
         }
@@ -40,7 +42,10 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
     const downloadCsv = () => {
         if (filteredLeads.length === 0) return;
         setDownloading(true);
-        const headers = ['İsim', 'E-posta', 'Mağaza URL', 'Paket', 'Tarih'];
+        const headers = language === 'tr'
+            ? ['İsim', 'E-posta', 'Mağaza URL', 'Paket', 'Tarih']
+            : ['Name', 'Email', 'Store URL', 'Package', 'Date'];
+
         const rows = filteredLeads.map(lead => [
             lead.name || '',
             lead.email || '',
@@ -66,7 +71,7 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
     return (
         <div className="bg-white p-6 rounded-2xl shadow-xl">
             <div className="flex flex-col lg:flex-row justify-between items-center mb-4 gap-4">
-                <h2 className="text-xl font-bold text-slate-800">Müşteri Adayları (Leads)</h2>
+                <h2 className="text-xl font-bold text-slate-800">{t('leads_table_title')}</h2>
                 <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                     <div className="relative flex-1">
                         <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -74,7 +79,7 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
                         </svg>
                         <input
                             type="text"
-                            placeholder="İsim, email veya mağaza ara..."
+                            placeholder={language === 'tr' ? "İsim, email veya mağaza ara..." : "Search name, email or store..."}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-100 border border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-300 focus:bg-white"
@@ -86,13 +91,13 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
                             disabled={filteredLeads.length === 0 || downloading}
                             className="px-4 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors disabled:opacity-50"
                         >
-                            {downloading ? 'Hazırlanıyor...' : '.CSV indir'}
+                            {downloading ? t('loading') : '.CSV'}
                         </button>
                         <button
                             onClick={() => setIsModalOpen(true)}
                             className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
                         >
-                            Yeni Lead
+                            {language === 'tr' ? 'Yeni Lead' : 'New Lead'}
                         </button>
                     </div>
                 </div>
@@ -101,11 +106,11 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
                 <table className="w-full text-sm text-left text-slate-500">
                     <thead className="text-xs text-slate-700 uppercase bg-slate-50">
                         <tr>
-                            <th scope="col" className="px-6 py-3 rounded-l-lg">İsim</th>
-                            <th scope="col" className="px-6 py-3">Mağaza URL</th>
-                            <th scope="col" className="px-6 py-3">Seçilen Paket</th>
-                            <th scope="col" className="px-6 py-3">Tarih</th>
-                            <th scope="col" className="px-6 py-3 text-center rounded-r-lg">İşlemler</th>
+                            <th scope="col" className="px-6 py-3 rounded-l-lg">{t('leads_table_name')}</th>
+                            <th scope="col" className="px-6 py-3">{t('user_table_store')}</th>
+                            <th scope="col" className="px-6 py-3">{t('leads_table_package')}</th>
+                            <th scope="col" className="px-6 py-3">{t('leads_table_date')}</th>
+                            <th scope="col" className="px-6 py-3 text-center rounded-r-lg">{t('user_table_actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -122,7 +127,7 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
                                                 {lead.store_url.replace('https://www.etsy.com/shop/', '')}
                                             </a>
                                         ) : (
-                                            <span className="text-slate-400">Belirtilmemiş</span>
+                                            <span className="text-slate-400">-</span>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 border-b border-slate-100">
@@ -135,7 +140,7 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
                                         <button
                                             onClick={() => handleDelete(lead.id)}
                                             className="p-2 text-slate-500 hover:text-red-600 rounded-md hover:bg-red-50 transition-colors"
-                                            aria-label="Lead Sil"
+                                            aria-label={t('delete')}
                                         >
                                             <DeleteIcon />
                                         </button>
@@ -145,7 +150,9 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
                         ) : (
                             <tr>
                                 <td colSpan={5} className="text-center py-8 text-slate-500">
-                                    {leads.length === 0 ? "Henüz müşteri adayı bulunmuyor." : "Aramanızla eşleşen sonuç bulunamadı."}
+                                    {leads.length === 0
+                                        ? (language === 'tr' ? "Henüz müşteri adayı bulunmuyor." : "No leads yet.")
+                                        : (language === 'tr' ? "Aramanızla eşleşen sonuç bulunamadı." : "No leads found matching your search.")}
                                 </td>
                             </tr>
                         )}

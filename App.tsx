@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboard';
 import UserDashboard from './components/UserDashboard';
 import Footer from './components/layout/Footer';
 import { SiteSettings } from './types';
+import { useLanguage } from './components/LanguageContext';
 
 // Admin panel credentials for demonstration.
 // To login as admin, use:
@@ -44,7 +45,7 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loadingSettings, setLoadingSettings] = useState(true);
-  const [language, setLanguage] = useState<'tr' | 'en'>('tr');
+  const { language, setLanguage } = useLanguage();
 
   // Check for placeholder credentials before doing anything else.
   if (supabaseUrl.includes('your-project-url') || supabaseAnonKey.includes('your-anon-key')) {
@@ -148,7 +149,7 @@ const App: React.FC = () => {
     return (
       <div className="min-h-screen flex flex-col bg-slate-50">
         <div className="flex-1">
-          <LoginScreen siteSettings={siteSettings} language={language} onLanguageChange={setLanguage} />
+          <LoginScreen siteSettings={siteSettings} />
         </div>
         <Footer text={siteSettings?.footer_text} />
       </div>
