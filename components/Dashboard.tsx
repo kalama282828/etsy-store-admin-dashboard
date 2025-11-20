@@ -103,6 +103,23 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
         }
     };
 
+    const handleUpdateLeadUrl = async (leadId: number, newUrl: string) => {
+        try {
+            const { error } = await supabase
+                .from('leads')
+                .update({ store_url: newUrl })
+                .eq('id', leadId);
+
+            if (error) throw error;
+
+            // Refresh the lead list
+            fetchData();
+        } catch (err: any) {
+            console.error('Lead URL güncellenirken hata:', err);
+            alert(`${t('error')}: ${err.message}`);
+        }
+    };
+
     const renderView = () => {
         switch (activeView) {
             case 'dashboard':
@@ -115,7 +132,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                             <SiteSettingsEditor onUpdate={onSettingsUpdate} />
                         </div>
                         <ProofEditor />
-                        <LeadsTable leads={leads} onRefresh={fetchData} />
+                        <LeadsTable leads={leads} onRefresh={fetchData} onUpdateUrl={handleUpdateLeadUrl} />
                         <BlogManager />
                         <UserTable users={registeredUsers} onDelete={handleDeleteUser} onUpdateUrl={handleUpdateUserUrl} />
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

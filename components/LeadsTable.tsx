@@ -8,13 +8,31 @@ import { useLanguage } from './LanguageContext';
 interface LeadsTableProps {
     leads: Lead[];
     onRefresh?: () => void;
+    onUpdateUrl: (leadId: number, newUrl: string) => Promise<void>;
 }
 
-const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
+const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh, onUpdateUrl }) => {
     const { t, language } = useLanguage();
     const [searchTerm, setSearchTerm] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [downloading, setDownloading] = useState(false);
+    const [editingId, setEditingId] = useState<number | null>(null);
+    const [editUrl, setEditUrl] = useState('');
+
+    const handleEditClick = (lead: Lead) => {
+        setEditingId(lead.id);
+        setEditUrl(lead.store_url || '');
+    };
+
+    const handleSaveClick = async (leadId: number) => {
+        await onUpdateUrl(leadId, editUrl);
+        setEditingId(null);
+    };
+
+    const handleCancelClick = () => {
+        setEditingId(null);
+        setEditUrl('');
+    };
 
     const filteredLeads = useMemo(() => leads.filter(lead =>
         (lead.name && lead.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -122,12 +140,45 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onRefresh }) => {
                                         <div className="font-normal text-slate-500">{lead.email}</div>
                                     </td>
                                     <td className="px-6 py-4 border-b border-slate-100">
-                                        {lead.store_url ? (
-                                            <a href={lead.store_url} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">
-                                                {lead.store_url.replace('https://www.etsy.com/shop/', '')}
-                                            </a>
+                                        {editingId === lead.id ? (
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={editUrl}
+                                                    onChange={(e) => setEditUrl(e.target.value)}
+                                                    className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:outline-none focus:border-primary-500"
+                                                    placeholder="https://www.etsy.com/shop/..."
+                                                />
+                                                <button onClick={() => handleSaveClick(lead.id)} className="text-green-600 hover:text-green-800">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 111.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                    </svg>
+                                                </button>
+                                                <button onClick={handleCancelClick} className="text-slate-400 hover:text-slate-600">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         ) : (
-                                            <span className="text-slate-400">-</span>
+                                            <div className="flex items-center justify-between group">
+                                                {lead.store_url ? (
+                                                    <a href={lead.store_url} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline truncate max-w-[200px]">
+                                                        {lead.store_url.replace('https://www.etsy.com/shop/', '')}
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-slate-400">-</span>
+                                                )}
+                                                <button
+                                                    onClick={() => handleEditClick(lead)}
+                                                    className="opacity-0 group-hover:opacity-100 ml-2 text-slate-400 hover:text-primary-600 transition-opacity"
+                                                    title={t('edit')}
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 border-b border-slate-100">
