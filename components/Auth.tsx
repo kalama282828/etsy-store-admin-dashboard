@@ -45,7 +45,8 @@ const Auth: React.FC<AuthProps> = ({ etsyUrl, language = 'tr' }) => {
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+    const [shopUrl, setShopUrl] = useState(etsyUrl || '');
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
     const locale = texts[language];
 
@@ -60,20 +61,20 @@ const Auth: React.FC<AuthProps> = ({ etsyUrl, language = 'tr' }) => {
                 if (error) throw error;
                 // The onAuthStateChange listener in App.tsx will handle the redirect.
             } else {
-                const { data, error } = await supabase.auth.signUp({ 
-                    email, 
+                const { data, error } = await supabase.auth.signUp({
+                    email,
                     password,
                     options: {
                         data: {
-                            etsy_store_url: etsyUrl || null
+                            etsy_store_url: shopUrl || null
                         }
                     }
                 });
                 if (error) throw error;
                 if (data.user && data.user.identities && data.user.identities.length === 0) {
-                     setMessage({ type: 'error', text: 'Bu kullanıcı zaten mevcut.'});
+                    setMessage({ type: 'error', text: 'Bu kullanıcı zaten mevcut.' });
                 } else {
-                     setMessage({ type: 'success', text: 'Onay bağlantısı için e-postanızı kontrol edin!'});
+                    setMessage({ type: 'success', text: 'Onay bağlantısı için e-postanızı kontrol edin!' });
                 }
             }
         } catch (error: any) {
@@ -89,14 +90,14 @@ const Auth: React.FC<AuthProps> = ({ etsyUrl, language = 'tr' }) => {
                 <h2 className="text-2xl font-bold text-center text-slate-800">
                     {isLogin ? locale.loginTitle : locale.signupTitle}
                 </h2>
-            <p className="text-center text-slate-500">
+                <p className="text-center text-slate-500">
                     {isLogin ? locale.noAccount : locale.haveAccount}
                     <button onClick={() => { setIsLogin(!isLogin); setMessage(null) }} className="font-medium text-primary-600 hover:text-primary-500 ml-1">
                         {isLogin ? locale.signupToggle : locale.loginToggle}
                     </button>
                 </p>
             </div>
-            
+
             <form className="space-y-4" onSubmit={handleAuth}>
                 <div>
                     <label htmlFor="email" className={labelBaseStyle}>
@@ -114,11 +115,29 @@ const Auth: React.FC<AuthProps> = ({ etsyUrl, language = 'tr' }) => {
                     />
                 </div>
 
+                {!isLogin && (
+                    <div>
+                        <label htmlFor="etsyUrl" className={labelBaseStyle}>
+                            Etsy Mağaza Linki
+                        </label>
+                        <input
+                            id="etsyUrl"
+                            name="etsyUrl"
+                            type="url"
+                            placeholder="https://www.etsy.com/shop/YourShop"
+                            required
+                            value={shopUrl}
+                            onChange={(e) => setShopUrl(e.target.value)}
+                            className={inputBaseStyle}
+                        />
+                    </div>
+                )}
+
                 <div>
                     <label htmlFor="password" className={labelBaseStyle}>
                         {locale.passwordLabel}
                     </label>
-                     <input
+                    <input
                         id="password"
                         name="password"
                         type="password"
@@ -139,13 +158,13 @@ const Auth: React.FC<AuthProps> = ({ etsyUrl, language = 'tr' }) => {
                         {loading ? locale.processing : (isLogin ? locale.submitLogin : locale.submitSignup)}
                     </button>
                 </div>
-            </form>
+            </form >
             {message && (
                 <p className={`text-center text-sm ${message.type === 'error' ? 'text-red-600' : 'text-green-600'}`}>
                     {message.text}
                 </p>
             )}
-        </div>
+        </div >
     );
 };
 

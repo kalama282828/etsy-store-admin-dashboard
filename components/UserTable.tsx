@@ -6,9 +6,10 @@ import { RegisteredUser } from '../types';
 // Fix: Defined the missing UserTableProps interface.
 interface UserTableProps {
     users: RegisteredUser[];
+    onDelete: (userId: string) => void;
 }
 
-const UserTable: React.FC<UserTableProps> = ({ users }) => {
+const UserTable: React.FC<UserTableProps> = ({ users, onDelete }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredUsers = users.filter(user =>
@@ -47,7 +48,8 @@ const UserTable: React.FC<UserTableProps> = ({ users }) => {
                         <tr>
                             <th scope="col" className="px-6 py-3 rounded-l-lg">Kullanıcı</th>
                             <th scope="col" className="px-6 py-3">Mağaza URL</th>
-                            <th scope="col" className="px-6 py-3 rounded-r-lg">Kayıt Tarihi</th>
+                            <th scope="col" className="px-6 py-3">Kayıt Tarihi</th>
+                            <th scope="col" className="px-6 py-3 rounded-r-lg text-right">İşlemler</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -67,11 +69,23 @@ const UserTable: React.FC<UserTableProps> = ({ users }) => {
                                         )}
                                     </td>
                                     <td className="px-6 py-4 border-b border-slate-100">{formatDate(user.created_at)}</td>
+                                    <td className="px-6 py-4 border-b border-slate-100 text-right">
+                                        <button
+                                            onClick={() => {
+                                                if (window.confirm('Bu kullanıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+                                                    onDelete(user.id);
+                                                }
+                                            }}
+                                            className="text-red-600 hover:text-red-800 font-medium hover:underline"
+                                        >
+                                            Sil
+                                        </button>
+                                    </td>
                                 </tr>
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={3} className="text-center py-8 text-slate-500">
+                                <td colSpan={4} className="text-center py-8 text-slate-500">
                                     {users.length === 0 ? "Henüz kayıtlı kullanıcı bulunmuyor." : "Aramanızla eşleşen kullanıcı bulunamadı."}
                                 </td>
                             </tr>
