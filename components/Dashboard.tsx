@@ -89,6 +89,20 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
         }
     };
 
+    const handleUpdateUserUrl = async (userId: string, newUrl: string) => {
+        try {
+            const { error } = await supabase.rpc('update_user_store_url', { user_id: userId, new_url: newUrl });
+            if (error) throw error;
+
+            // Refresh the user list
+            fetchData();
+            // Optional: Show success toast
+        } catch (err: any) {
+            console.error('URL güncellenirken hata:', err);
+            alert(`${t('error')}: ${err.message}`);
+        }
+    };
+
     const renderView = () => {
         switch (activeView) {
             case 'dashboard':
@@ -103,7 +117,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                         <ProofEditor />
                         <LeadsTable leads={leads} onRefresh={fetchData} />
                         <BlogManager />
-                        <UserTable users={registeredUsers} onDelete={handleDeleteUser} />
+                        <UserTable users={registeredUsers} onDelete={handleDeleteUser} onUpdateUrl={handleUpdateUserUrl} />
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                             <div className="lg:col-span-2">
                                 <CustomerTable customers={customers} onDataChange={fetchData} />
