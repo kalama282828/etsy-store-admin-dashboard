@@ -91,23 +91,25 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
 
     useEffect(() => {
         fetchMessages();
-        const intervalId = window.setInterval(fetchMessages, 3000);
         const channel = supabase
             .channel(`live-chat-${conversationId}`)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, (payload) => {
-                const msg = payload.new as UserMessage | null;
-                if (!msg || msg.conversation_id !== conversationId) return;
-                setMessages((prev) => [...prev, msg]);
-                if (payload.eventType === 'INSERT') {
-                    onMessageCreated?.();
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` },
+                (payload) => {
+                    const msg = payload.new as UserMessage | null;
+                    if (!msg) return;
+                    setMessages((prev) => [...prev, msg]);
+                    if (payload.eventType === 'INSERT') {
+                        onMessageCreated?.();
+                    }
+                    if (msg.sender_id !== senderId && !isOpen) {
+                        setUnreadCount(prev => prev + 1);
+                    }
                 }
-                if (msg.sender_id !== senderId && !isOpen) {
-                    setUnreadCount(prev => prev + 1);
-                }
-            })
+            )
             .subscribe();
         return () => {
-            window.clearInterval(intervalId);
             supabase.removeChannel(channel);
         };
     }, [conversationId, senderId, isOpen]);
@@ -147,6 +149,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
         return () => {
             markPresence(false);
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isOpen, role, senderId, mode]);
 
     useEffect(() => {

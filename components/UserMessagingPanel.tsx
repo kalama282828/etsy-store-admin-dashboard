@@ -40,11 +40,7 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
             )
             .subscribe();
 
-        // Poll as a fallback in case realtime is disabled.
-        const intervalId = window.setInterval(fetchConversations, 7000);
-
         return () => {
-            window.clearInterval(intervalId);
             supabase.removeChannel(channel);
         };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -302,6 +298,22 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
                                     {activeConversations.find(c => c.email === selectedEmail)?.name || selectedEmail}
                                 </h3>
                                 <span className="text-xs text-metallic-400">{selectedEmail}</span>
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => handleArchive(selectedEmail)}
+                                    className="px-3 py-2 text-xs font-semibold rounded-lg border border-white/10 bg-white/5 text-metallic-200 hover:bg-white/10 transition-colors"
+                                    title={t('archive')}
+                                >
+                                    {activeConversations.find(c => c.email === selectedEmail)?.isArchived ? t('messages_tab_active') : t('archive')}
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(selectedEmail)}
+                                    className="px-3 py-2 text-xs font-semibold rounded-lg border border-red-500/20 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-colors"
+                                    title={t('delete')}
+                                >
+                                    {t('delete')}
+                                </button>
                             </div>
                         </div>
                         <div className="flex-1 overflow-hidden">
