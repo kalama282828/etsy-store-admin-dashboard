@@ -15,9 +15,10 @@ interface LiveChatWidgetProps {
 
 interface UserMessage {
     id: number;
-    user_email: string;
+    conversation_id: string;  // Changed from user_email
+    sender_id: string;         // Changed from sent_by
     message: string;
-    sent_by: string | null;
+    is_admin_message?: boolean;
     created_at: string;
 }
 
@@ -50,18 +51,19 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
         if (!welcomeMessage) return null;
         return {
             id: -1,
-            user_email: conversationId,
+            conversation_id: conversationId,
+            sender_id: counterpartId || 'admin',
             message: welcomeMessage,
-            sent_by: counterpartId || 'admin', // Treat as received from admin
+            is_admin_message: true,
             created_at: new Date().toISOString(),
         };
     };
 
     const fetchMessages = async () => {
         const { data, error } = await supabase
-            .from('user_messages')
+            .from('messages')
             .select('*')
-            .eq('user_email', conversationId)
+            .eq('conversation_id', conversationId)
             .order('created_at', { ascending: true });
 
         let msgs = (data as UserMessage[]) || [];
@@ -86,11 +88,11 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
         fetchMessages();
         const channel = supabase
             .channel(`live-chat-${conversationId}`)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'user_messages', filter: `user_email=eq.${conversationId}` }, (payload) => {
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => {
                 if (payload.new) {
                     const msg = payload.new as UserMessage;
                     setMessages((prev) => [...prev, msg]);
-                    if (msg.sent_by !== senderId && !isOpen) {
+                    if (msg.sender_id !== senderId && !isOpen) {
                         setUnreadCount(prev => prev + 1);
                     }
                 }
@@ -165,11 +167,12 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
         if (!input.trim()) return;
         setLoading(true);
         const { error } = await supabase
-            .from('user_messages')
+            .from('messages')
             .insert({
-                user_email: conversationId,
+                conversation_id: conversationId,
+                sender_id: senderId,
                 message: input.trim(),
-                sent_by: senderId,
+                is_admin_message: role === 'admin',
             });
         if (!error) {
             setInput('');
@@ -195,10 +198,10 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
             </div>
             <div className="flex-1 px-4 py-3 overflow-y-auto space-y-3 custom-scrollbar bg-transparent">
                 {messages.map((msg) => (
-                    <div key={msg.id} className={`flex ${msg.sent_by === senderId ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm shadow-sm ${msg.sent_by === senderId ? 'bg-primary-600 text-white rounded-br-none' : 'bg-metallic-800 text-metallic-200 rounded-bl-none border border-white/5'}`}>
+                    <div key={msg.id} className={`flex ${msg.sender_id === senderId ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm shadow-sm ${msg.sender_id === senderId ? 'bg-primary-600 text-white rounded-br-none' : 'bg-metallic-800 text-metallic-200 rounded-bl-none border border-white/5'}`}>
                             <p>{msg.message}</p>
-                            <span className={`text-[10px] block mt-1 ${msg.sent_by === senderId ? 'text-primary-200' : 'text-metallic-500'}`}>{new Date(msg.created_at).toLocaleTimeString()}</span>
+                            <span className={`text-[10px] block mt-1 ${msg.sender_id === senderId ? 'text-primary-200' : 'text-metallic-500'}`}>{new Date(msg.created_at).toLocaleTimeString()}</span>
                         </div>
                     </div>
                 ))}
