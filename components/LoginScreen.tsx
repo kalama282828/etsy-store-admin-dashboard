@@ -246,8 +246,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                     ))}
                 </div>
                 {isAuthModalOpen && (
-                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
-                        <div className="bg-metallic-900 border border-white/10 rounded-2xl shadow-2xl p-8 max-w-md w-full relative transform transition-all animate-scaleIn">
+                    <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
+                        <div className="bg-metallic-900/80 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl p-8 max-w-md w-full relative transform transition-all animate-scaleIn">
                             <button onClick={() => setIsAuthModalOpen(false)} className="absolute top-4 right-4 text-metallic-400 hover:text-white transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
@@ -366,7 +366,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                             </div>
                             <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {displayContent.features.cards.map((feature, index) => (
-                                    <div key={index} className="bg-metallic-900/50 backdrop-blur-xl p-6 rounded-2xl transition-all duration-300 hover:bg-metallic-900/80 hover:shadow-2xl hover:-translate-y-2 border border-white/5 hover:border-primary-500/30 group">
+                                    <div key={index} className="bg-white/5 backdrop-blur-2xl p-6 rounded-2xl transition-all duration-300 hover:bg-white/10 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:-translate-y-2 border border-white/10 hover:border-primary-400/50 group">
                                         <div className="flex-shrink-0 w-12 h-12 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center group-hover:bg-primary-500/20 transition-colors">
                                             {featureIcons[index % featureIcons.length]}
                                         </div>

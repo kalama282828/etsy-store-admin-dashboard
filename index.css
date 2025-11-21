@@ -5,7 +5,7 @@
 @layer base {
   body {
     @apply bg-metallic-950 text-metallic-200 antialiased;
-    background-image: radial-gradient(circle at 50% 0%, #27272a 0%, #09090b 100%);
+    background-image: radial-gradient(circle at 50% 0%, #3f3f46 0%, #18181b 100%);
     min-height: 100vh;
   }
 }
