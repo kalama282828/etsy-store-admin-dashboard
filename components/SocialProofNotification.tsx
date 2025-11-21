@@ -22,9 +22,9 @@ const SocialProofNotification: React.FC<SocialProofNotificationProps> = ({ messa
 
     return (
         <div
-            className={`fixed z-50 pointer-events-none transition-all duration-400 ease-out ${
+            className={`fixed z-40 pointer-events-none transition-all duration-400 ease-out ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
-            } bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 flex justify-center sm:justify-end`}
+            } bottom-4 left-4 right-4 sm:left-6 sm:right-auto sm:bottom-6 flex justify-center sm:justify-start`}
         >
             <div className="pointer-events-auto bg-metallic-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10 p-3 sm:p-4 flex items-start gap-3 w-full max-w-[420px]">
                 <div className="flex-shrink-0">
