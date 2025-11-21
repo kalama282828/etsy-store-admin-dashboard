@@ -15,6 +15,7 @@ interface LiveChatWidgetProps {
     mode?: 'floating' | 'panel';
     triggerLabel?: string;
     onClose?: () => void;
+    onMessageCreated?: () => void;
 }
 
 interface UserMessage {
@@ -39,7 +40,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
     triggerLabel,
     onClose,
     welcomeMessage,
-}) => {
+    }) => {
     const { t } = useLanguage();
     const [open, setOpen] = useState(mode === 'panel');
     const [messages, setMessages] = useState<UserMessage[]>([]);
@@ -90,12 +91,16 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
 
     useEffect(() => {
         fetchMessages();
+        const intervalId = window.setInterval(fetchMessages, 5000);
         const channel = supabase
             .channel(`live-chat-${conversationId}`)
             .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => {
                 if (payload.new) {
                     const msg = payload.new as UserMessage;
                     setMessages((prev) => [...prev, msg]);
+                    if (payload.eventType === 'INSERT') {
+                        onMessageCreated?.();
+                    }
                     if (msg.sender_id !== senderId && !isOpen) {
                         setUnreadCount(prev => prev + 1);
                     }
@@ -103,6 +108,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
             })
             .subscribe();
         return () => {
+            window.clearInterval(intervalId);
             supabase.removeChannel(channel);
         };
     }, [conversationId, senderId, isOpen]);
@@ -181,6 +187,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
         if (!error) {
             setInput('');
             fetchMessages();
+            onMessageCreated?.();
         }
         setLoading(false);
     };

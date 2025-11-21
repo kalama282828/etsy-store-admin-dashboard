@@ -34,12 +34,16 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
             .channel('admin-conversation-feed')
             .on(
                 'postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'messages' },
+                { event: '*', schema: 'public', table: 'messages' },
                 () => fetchConversations()
             )
             .subscribe();
 
+        // Poll as a fallback in case realtime is disabled.
+        const intervalId = window.setInterval(fetchConversations, 7000);
+
         return () => {
+            window.clearInterval(intervalId);
             supabase.removeChannel(channel);
         };
     }, [users]);
@@ -282,6 +286,7 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
                                 counterpartId={selectedEmail}
                                 role="admin"
                                 label={`Chat: ${selectedEmail}`}
+                                onMessageCreated={fetchConversations}
                             />
                         </div>
                     </div>
