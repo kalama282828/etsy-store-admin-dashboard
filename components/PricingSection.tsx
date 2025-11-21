@@ -14,11 +14,11 @@ const SubscriberCounter: React.FC<{ count?: number; language: 'tr' | 'en' }> = (
     }
 
     return (
-        <div className="mt-4 text-center text-sm text-slate-500">
+        <div className="mt-4 text-center text-sm text-metallic-400">
             {language === 'en' ? (
-                <>Currently <span className="font-bold text-primary-600">{count} people</span> subscribe to this plan</>
+                <>Currently <span className="font-bold text-primary-400">{count} people</span> subscribe to this plan</>
             ) : (
-                <>Şu anda <span className="font-bold text-primary-600">{count} kişi</span> bu plana abone</>
+                <>Şu anda <span className="font-bold text-primary-400">{count} kişi</span> bu plana abone</>
             )}
         </div>
     );
@@ -36,7 +36,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onPayClick, language = 
                 .from('packages')
                 .select('*')
                 .order('price', { ascending: true });
-            
+
             if (error) {
                 console.error('Error fetching packages:', error);
             } else {
@@ -71,22 +71,22 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onPayClick, language = 
     return (
         <div className={`grid grid-cols-1 ${packages.length > 1 ? 'md:grid-cols-3' : ''} gap-8 items-start`}>
             {isDataLoading ? (
-                <p className="text-slate-500 col-span-full text-center">
+                <p className="text-metallic-400 col-span-full text-center">
                     {language === 'en' ? 'Plans are loading...' : 'Planlar yükleniyor...'}
                 </p>
             ) : (
                 packages.map((pkg) => (
-                    <div key={pkg.name} className={`bg-white p-8 rounded-2xl shadow-md border-2 transition-transform transform ${pkg.isPopular ? 'border-primary-500 scale-105' : 'border-transparent'}`}>
-                        {pkg.isPopular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Popüler</div>}
+                    <div key={pkg.name} className={`bg-metallic-900/50 backdrop-blur-xl p-8 rounded-2xl shadow-xl transition-transform transform ${pkg.isPopular ? 'border border-primary-500/50 scale-105 shadow-[0_0_30px_rgba(99,102,241,0.15)]' : 'border border-white/5 hover:border-white/10'}`}>
+                        {pkg.isPopular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-primary-600/20">Popüler</div>}
                         <div className="text-center">
-                            <h3 className="text-xl font-bold text-slate-800">{pkg.name}</h3>
-                            <p className="mt-2 text-4xl font-bold text-slate-900">${pkg.price}<span className="text-base font-normal text-slate-500">/ay</span></p>
+                            <h3 className="text-xl font-bold text-white">{pkg.name}</h3>
+                            <p className="mt-2 text-4xl font-bold text-metallic-200">${pkg.price}<span className="text-base font-normal text-metallic-500">/ay</span></p>
                         </div>
                         <SubscriberCounter count={pkg.subscribers} language={language} />
-                        <ul className="mt-6 space-y-3 text-sm text-slate-600">
+                        <ul className="mt-6 space-y-3 text-sm text-metallic-300">
                             {pkg.features.map((feature) => (
                                 <li key={feature} className="flex items-center">
-                                    <CheckIcon className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
+                                    <CheckIcon className="w-5 h-5 text-green-400 mr-3 flex-shrink-0" />
                                     <span>{feature}</span>
                                 </li>
                             ))}
@@ -94,21 +94,21 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onPayClick, language = 
                         <button
                             onClick={() => handleClick(pkg.name)}
                             disabled={paymentLoading !== null}
-                            className={`w-full mt-8 py-3 px-4 rounded-full font-semibold text-base transition-colors duration-300
-                                ${pkg.isPopular ? 'bg-primary-600 text-white hover:bg-primary-700' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}
-                                ${paymentLoading === pkg.name ? 'cursor-not-allowed bg-slate-300' : ''}
+                            className={`w-full mt-8 py-3 px-4 rounded-xl font-semibold text-base transition-all duration-300
+                                ${pkg.isPopular ? 'bg-primary-600 text-white hover:bg-primary-500 shadow-lg shadow-primary-600/20' : 'bg-white/10 text-white hover:bg-white/20 border border-white/5'}
+                                ${paymentLoading === pkg.name ? 'cursor-not-allowed opacity-70' : ''}
                                 ${success === pkg.name ? 'cursor-not-allowed bg-green-500 text-white' : ''}
                                 disabled:opacity-50
                             `}
                         >
-                           {onPayClick 
+                            {onPayClick
                                 ? (language === 'en' ? 'Choose Plan' : 'Planı Seç')
                                 : paymentLoading === pkg.name
                                     ? (language === 'en' ? 'Processing...' : 'İşleniyor...')
                                     : success === pkg.name
                                         ? (language === 'en' ? 'Payment Successful!' : 'Ödeme Başarılı!')
                                         : (language === 'en' ? 'Pay with Stripe' : 'Stripe ile Öde')
-                           }
+                            }
                         </button>
                     </div>
                 ))

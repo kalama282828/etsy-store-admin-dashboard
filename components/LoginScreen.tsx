@@ -355,23 +355,23 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                         </div>
                     </section>
 
-                    <section className="py-20 lg:py-28 bg-slate-100">
+                    <section className="py-20 lg:py-28 bg-transparent">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="text-center">
-                                <h2 className="text-base font-semibold text-primary-600 tracking-wider uppercase">
+                                <h2 className="text-base font-semibold text-primary-400 tracking-wider uppercase">
                                     {language === 'en' ? 'Features' : 'Özellikler'}
                                 </h2>
-                                <p className="mt-2 text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">{displayContent.features.title}</p>
-                                <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-500">{displayContent.features.subtitle}</p>
+                                <p className="mt-2 text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{displayContent.features.title}</p>
+                                <p className="mt-4 max-w-2xl mx-auto text-lg text-metallic-400">{displayContent.features.subtitle}</p>
                             </div>
                             <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {displayContent.features.cards.map((feature, index) => (
-                                    <div key={index} className="bg-white p-6 rounded-2xl transition-all duration-300 hover:bg-white hover:shadow-2xl hover:-translate-y-2 border border-slate-200/80">
-                                        <div className="flex-shrink-0 w-12 h-12 bg-primary-100 text-primary-600 rounded-lg flex items-center justify-center">
+                                    <div key={index} className="bg-metallic-900/50 backdrop-blur-xl p-6 rounded-2xl transition-all duration-300 hover:bg-metallic-900/80 hover:shadow-2xl hover:-translate-y-2 border border-white/5 hover:border-primary-500/30 group">
+                                        <div className="flex-shrink-0 w-12 h-12 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center group-hover:bg-primary-500/20 transition-colors">
                                             {featureIcons[index % featureIcons.length]}
                                         </div>
-                                        <h3 className="text-xl font-bold text-slate-800 mt-5">{feature.title}</h3>
-                                        <p className="mt-2 text-slate-600">{feature.description}</p>
+                                        <h3 className="text-xl font-bold text-white mt-5">{feature.title}</h3>
+                                        <p className="mt-2 text-metallic-400">{feature.description}</p>
                                     </div>
                                 ))}
                             </div>

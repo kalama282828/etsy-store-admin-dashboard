@@ -144,51 +144,51 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
     };
 
     return (
-        <div className="min-h-screen bg-slate-100">
-            <header className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="min-h-screen bg-metallic-950 bg-metallic-gradient text-metallic-200">
+            <header className="bg-metallic-900/50 backdrop-blur-xl border-b border-white/5 sticky top-0 z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         <div className="flex items-center space-x-2">
-                           {siteSettings?.logo_url ? (
+                            {siteSettings?.logo_url ? (
                                 <img src={siteSettings.logo_url} alt={`${siteSettings.site_name} logo`} className="h-8 object-contain" />
                             ) : (
-                               <>
-                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-600" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                                </svg>
-                                <span className="text-xl font-bold text-slate-800">{siteSettings?.site_name || 'Panelim'}</span>
-                               </>
+                                <>
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-600" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                                    </svg>
+                                    <span className="text-xl font-bold text-white">{siteSettings?.site_name || 'Panelim'}</span>
+                                </>
                             )}
                         </div>
-                        <button 
+                        <button
                             onClick={handleLogout}
-                            className="px-5 py-2 text-sm font-medium text-white bg-primary-600 rounded-full hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+                            className="px-5 py-2 text-sm font-medium text-white bg-primary-600 rounded-full hover:bg-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all shadow-lg shadow-primary-500/20"
                         >
                             Çıkış Yap
                         </button>
                     </div>
                 </div>
             </header>
-            
+
             <main className="p-4 sm:p-6 lg:p-8">
                 <div className="max-w-6xl mx-auto space-y-6">
-                    <div className="bg-white p-6 rounded-2xl shadow">
+                    <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-xl">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
-                                <p className="text-sm text-slate-500">Merhaba</p>
-                                <h1 className="text-3xl font-semibold text-slate-900">{user.user_metadata?.full_name || user.email}</h1>
-                                <p className="text-slate-500 mt-1">
+                                <p className="text-sm text-metallic-400">Merhaba</p>
+                                <h1 className="text-3xl font-semibold text-white">{user.user_metadata?.full_name || user.email}</h1>
+                                <p className="text-metallic-400 mt-1">
                                     Talebiniz {leadInfo?.created_at ? new Date(leadInfo.created_at).toLocaleDateString('tr-TR') : 'henüz kaydedilmedi'} tarihinde alındı.
                                 </p>
                             </div>
                             <div className="flex gap-4">
                                 <div className="text-center">
-                                    <p className="text-xs uppercase tracking-wide text-slate-500">Paket</p>
-                                    <p className="text-lg font-semibold text-slate-800">{leadInfo?.selected_package || selectedPackage || 'Seçilmedi'}</p>
+                                    <p className="text-xs uppercase tracking-wide text-metallic-500">Paket</p>
+                                    <p className="text-lg font-semibold text-white">{leadInfo?.selected_package || selectedPackage || 'Seçilmedi'}</p>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-xs uppercase tracking-wide text-slate-500">Durum</p>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${leadInfo ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
+                                    <p className="text-xs uppercase tracking-wide text-metallic-500">Durum</p>
+                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${leadInfo ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
                                         {leadInfo ? 'İşlemde' : 'Bekliyor'}
                                     </span>
                                 </div>
@@ -197,29 +197,29 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                     </div>
 
                     {error && (
-                        <div className="bg-red-50 text-red-700 border border-red-200 rounded-xl p-4">{error}</div>
+                        <div className="bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl p-4">{error}</div>
                     )}
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow">
-                            <h2 className="text-lg font-semibold text-slate-900 mb-4">Hesap Özeti</h2>
+                        <div className="lg:col-span-2 bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-xl">
+                            <h2 className="text-lg font-semibold text-white mb-4">Hesap Özeti</h2>
                             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {profileItems.map((item) => (
-                                    <div key={item.label} className="border border-slate-100 rounded-xl p-4">
-                                        <dt className="text-xs uppercase tracking-wide text-slate-500">{item.label}</dt>
-                                        <dd className="text-sm font-medium text-slate-900 mt-1 break-all">{item.value || '—'}</dd>
+                                    <div key={item.label} className="border border-white/10 bg-black/20 rounded-xl p-4">
+                                        <dt className="text-xs uppercase tracking-wide text-metallic-500">{item.label}</dt>
+                                        <dd className="text-sm font-medium text-white mt-1 break-all">{item.value || '—'}</dd>
                                     </div>
                                 ))}
                             </dl>
                         </div>
-                        <div className="bg-white p-6 rounded-2xl shadow">
-                            <h2 className="text-lg font-semibold text-slate-900 mb-3">Onboarding Durumu</h2>
+                        <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-xl">
+                            <h2 className="text-lg font-semibold text-white mb-3">Onboarding Durumu</h2>
                             <div className="space-y-3">
                                 {checklist.map((item, idx) => {
                                     const completed = leadInfo ? idx <= 1 : idx === 0;
                                     return (
                                         <div key={item.id} className="flex items-start gap-3">
-                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${completed ? 'bg-primary-500' : 'bg-slate-300'}`}>
+                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white ${completed ? 'bg-primary-500' : 'bg-metallic-800'}`}>
                                                 {completed ? (
                                                     <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                                                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 111.414-1.414L8.414 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -229,8 +229,8 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-semibold text-slate-900">{item.label}</p>
-                                                <p className="text-xs text-slate-500">{item.description}</p>
+                                                <p className="text-sm font-semibold text-white">{item.label}</p>
+                                                <p className="text-xs text-metallic-400">{item.description}</p>
                                             </div>
                                         </div>
                                     );
@@ -240,21 +240,21 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="bg-white p-6 rounded-2xl shadow lg:col-span-2">
-                            <h2 className="text-lg font-semibold text-slate-900 mb-4">Plan Detayları</h2>
+                        <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-xl lg:col-span-2">
+                            <h2 className="text-lg font-semibold text-white mb-4">Plan Detayları</h2>
                             {currentPackage ? (
-                                <div className="border border-primary-200 rounded-2xl p-5 bg-primary-50/40">
+                                <div className="border border-primary-500/20 rounded-2xl p-5 bg-primary-500/10">
                                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                         <div>
-                                            <p className="text-xs text-primary-600 uppercase tracking-wide">Seçili Plan</p>
-                                            <h3 className="text-2xl font-bold text-primary-800">{currentPackage.name}</h3>
+                                            <p className="text-xs text-primary-400 uppercase tracking-wide">Seçili Plan</p>
+                                            <h3 className="text-2xl font-bold text-white">{currentPackage.name}</h3>
                                         </div>
-                                        <p className="text-3xl font-semibold text-primary-800 mt-2 sm:mt-0">
+                                        <p className="text-3xl font-semibold text-primary-400 mt-2 sm:mt-0">
                                             ${currentPackage.price}
-                                            <span className="text-base font-normal text-primary-600"> / ay</span>
+                                            <span className="text-base font-normal text-primary-300"> / ay</span>
                                         </p>
                                     </div>
-                                    <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                                    <ul className="mt-4 space-y-2 text-sm text-metallic-300">
                                         {currentPackage.features.map(feature => (
                                             <li key={feature} className="flex items-center gap-2">
                                                 <span className="w-1.5 h-1.5 bg-primary-500 rounded-full" />
@@ -264,69 +264,69 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                                     </ul>
                                 </div>
                             ) : (
-                                <p className="text-sm text-slate-500">Henüz kayıtlı bir paket bulunamadı. Başvurunuz işlendiğinde buradan takip edebilirsiniz.</p>
+                                <p className="text-sm text-metallic-500">Henüz kayıtlı bir paket bulunamadı. Başvurunuz işlendiğinde buradan takip edebilirsiniz.</p>
                             )}
                         </div>
-                        <div className="bg-white p-6 rounded-2xl shadow">
-                            <h2 className="text-lg font-semibold text-slate-900 mb-3">Destek</h2>
-                            <p className="text-sm text-slate-600">
+                        <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-xl">
+                            <h2 className="text-lg font-semibold text-white mb-3">Destek</h2>
+                            <p className="text-sm text-metallic-400">
                                 Sorularınız mı var? Ekibimiz hafta içi 09:00 - 18:00 saatleri arasında yanıt veriyor.
                             </p>
                             <div className="mt-4 space-y-2 text-sm">
-                                <a href="mailto:support@example.com" className="block px-4 py-2 rounded-lg border border-slate-200 hover:bg-primary-50 text-primary-700 text-center">
+                                <a href="mailto:support@example.com" className="block px-4 py-2 rounded-xl border border-white/10 hover:bg-white/5 text-primary-400 text-center transition-colors">
                                     support@example.com
                                 </a>
-                                <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" className="block px-4 py-2 rounded-lg border border-primary-200 bg-primary-50 text-primary-700 text-center">
+                                <a href="https://calendly.com" target="_blank" rel="noopener noreferrer" className="block px-4 py-2 rounded-xl border border-primary-500/20 bg-primary-500/10 text-primary-400 text-center hover:bg-primary-500/20 transition-colors">
                                     Görüşme Planla
                                 </a>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-2xl shadow">
-                        <h2 className="text-lg font-semibold text-slate-900 mb-4">Paket Seçimi & Ödeme</h2>
+                    <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-xl">
+                        <h2 className="text-lg font-semibold text-white mb-4">Paket Seçimi & Ödeme</h2>
                         <form onSubmit={handlePackageSubmit} className="space-y-4">
                             <div>
-                                <label htmlFor="storeUrl" className="text-sm font-medium text-slate-700">Etsy Mağaza URL&apos;niz</label>
+                                <label htmlFor="storeUrl" className="text-sm font-medium text-metallic-300">Etsy Mağaza URL&apos;niz</label>
                                 <input
                                     id="storeUrl"
                                     type="url"
                                     value={storeUrl}
                                     onChange={(e) => setStoreUrl(e.target.value)}
                                     placeholder="https://www.etsy.com/shop/..."
-                                    className="mt-1 block w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                                    className="mt-1 block w-full rounded-xl border border-white/10 bg-black/20 px-4 py-2.5 text-sm text-white placeholder-metallic-600 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all"
                                 />
                             </div>
                             <div>
-                                <p className="text-sm font-medium text-slate-700 mb-2">Paket seçimi</p>
+                                <p className="text-sm font-medium text-metallic-300 mb-2">Paket seçimi</p>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     {packages.map(pkg => (
                                         <button
                                             type="button"
                                             key={pkg.name}
                                             onClick={() => handlePackageSelect(pkg.name)}
-                                            className={`text-left border rounded-xl p-4 transition-all ${selectedPackage === pkg.name ? 'border-primary-500 bg-primary-50 shadow' : 'border-slate-200 hover:border-primary-200'}`}
+                                            className={`text-left border rounded-xl p-4 transition-all ${selectedPackage === pkg.name ? 'border-primary-500 bg-primary-500/10 shadow-[0_0_20px_rgba(99,102,241,0.15)]' : 'border-white/10 bg-black/20 hover:border-white/20 hover:bg-black/30'}`}
                                         >
-                                            <p className="text-sm font-semibold text-slate-900">{pkg.name}</p>
-                                            <p className="text-lg font-bold text-slate-800">${pkg.price}<span className="text-xs text-slate-500">/ay</span></p>
-                                            <p className="text-xs text-slate-500">{pkg.features[0]}</p>
+                                            <p className="text-sm font-semibold text-white">{pkg.name}</p>
+                                            <p className="text-lg font-bold text-metallic-200">${pkg.price}<span className="text-xs text-metallic-500">/ay</span></p>
+                                            <p className="text-xs text-metallic-400">{pkg.features[0]}</p>
                                         </button>
                                     ))}
                                 </div>
                             </div>
                             {selectionMessage && (
-                                <div className={`text-sm ${selectionMessage.includes('Lütfen') || selectionMessage.includes('hata') ? 'text-red-600' : 'text-green-600'}`}>
+                                <div className={`text-sm ${selectionMessage.includes('Lütfen') || selectionMessage.includes('hata') ? 'text-red-400' : 'text-green-400'}`}>
                                     {selectionMessage}
                                 </div>
                             )}
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                                <p className="text-xs text-slate-500">
+                                <p className="text-xs text-metallic-500">
                                     “Kaydet & Stripe’a Git” butonuna tıkladığınızda seçiminiz kaydedilir ve ödeme adımına yönlendirilirsiniz.
                                 </p>
                                 <button
                                     type="submit"
                                     disabled={savingSelection}
-                                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 disabled:opacity-50"
+                                    className="inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-primary-600 text-white text-sm font-semibold hover:bg-primary-500 disabled:opacity-50 transition-all shadow-lg shadow-primary-500/20"
                                 >
                                     {savingSelection ? 'Kaydediliyor...' : 'Kaydet & Stripe’a Git'}
                                 </button>
@@ -334,29 +334,29 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ user, siteSettings }) => 
                         </form>
                     </div>
 
-                    <footer className="bg-primary-600 text-white rounded-2xl p-6 shadow flex flex-col md:flex-row md:items-center md:justify-between">
+                    <footer className="bg-primary-600/20 backdrop-blur-xl border border-primary-500/30 text-white rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center md:justify-between">
                         <div>
-                            <p className="text-sm uppercase tracking-wide text-primary-100">Powered by Etsy Growth Lab</p>
-                            <h3 className="text-2xl font-semibold mt-1">Analiz raporunuz hazırlanıyor</h3>
-                            <p className="text-primary-100 mt-2 text-sm">Hazır olduğunda size e-posta ile bildireceğiz.</p>
+                            <p className="text-sm uppercase tracking-wide text-primary-300">Powered by Etsy Growth Lab</p>
+                            <h3 className="text-2xl font-semibold mt-1 text-white">Analiz raporunuz hazırlanıyor</h3>
+                            <p className="text-primary-200 mt-2 text-sm">Hazır olduğunda size e-posta ile bildireceğiz.</p>
                         </div>
                         <div className="mt-4 md:mt-0 text-right">
-                            <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/15 text-white text-sm font-semibold">
+                            <span className="inline-flex items-center px-4 py-2 rounded-full bg-white/10 border border-white/10 text-white text-sm font-semibold">
                                 Talep ID: {leadInfo?.id || 'bekleniyor'}
                             </span>
-                            <p className="text-xs text-primary-200 mt-2">{siteSettings?.footer_text || '© 2025 Etsy Admin Dashboard. All rights reserved.'}</p>
+                            <p className="text-xs text-primary-300 mt-2">{siteSettings?.footer_text || '© 2025 Etsy Admin Dashboard. All rights reserved.'}</p>
                         </div>
                     </footer>
                 </div>
 
                 {loading && (
-                    <div className="fixed inset-0 bg-white/60 flex items-center justify-center">
-                        <div className="bg-white p-4 rounded-xl shadow-md flex items-center gap-3">
-                            <svg className="animate-spin h-6 w-6 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+                        <div className="bg-metallic-900 border border-white/10 p-4 rounded-xl shadow-2xl flex items-center gap-3">
+                            <svg className="animate-spin h-6 w-6 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <span className="text-sm font-medium text-slate-700">Bilgiler yükleniyor...</span>
+                            <span className="text-sm font-medium text-white">Bilgiler yükleniyor...</span>
                         </div>
                     </div>
                 )}
