@@ -15,6 +15,7 @@ interface ConversationItem {
     lastActive?: string;
     name?: string;
     isArchived?: boolean;
+    lastSenderId?: string;
 }
 
 type Tab = 'active' | 'archived';
@@ -46,6 +47,7 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
             window.clearInterval(intervalId);
             supabase.removeChannel(channel);
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [users]);
 
     const fetchConversations = async () => {
@@ -75,10 +77,11 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
                         isRegistered: !!user,
                         lastActive: msg.created_at,
                         name: user?.etsy_store_url,
-                        isArchived: false // Default, will be updated below
+                        isArchived: false, // Default, will be updated below
+                        lastSenderId: msg.sender_id
                     });
                 } else if (new Date(msg.created_at).getTime() > new Date(already.lastActive || '').getTime()) {
-                    conversationMap.set(conversationEmail, { ...already, lastActive: msg.created_at });
+                    conversationMap.set(conversationEmail, { ...already, lastActive: msg.created_at, lastSenderId: msg.sender_id });
                 }
             });
 
@@ -91,14 +94,31 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
                 conversationStates.forEach(state => {
                     if (conversationMap.has(state.user_email)) {
                         const conv = conversationMap.get(state.user_email)!;
-                        conv.isArchived = state.is_archived;
+                        conv.isArchived = !!state.is_archived;
                         conversationMap.set(state.user_email, conv);
                     }
                 });
             }
 
+            const ADMIN_IDS = ['admin', ADMIN_CHAT_ID];
+
+            // Auto-unarchive if yeni mesaj admin dışından geldiyse
+            const conversationList = Array.from(conversationMap.values());
+            await Promise.all(conversationList.map(async (conv) => {
+                if (conv.lastSenderId && !ADMIN_IDS.includes(conv.lastSenderId) && conv.isArchived) {
+                    await supabase
+                        .from('conversation_states')
+                        .upsert({
+                            user_email: conv.email,
+                            is_archived: false,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'user_email' });
+                    conv.isArchived = false;
+                }
+            }));
+
             // Most recent first
-            const sorted = Array.from(conversationMap.values()).sort((a, b) => {
+            const sorted = conversationList.sort((a, b) => {
                 const aTime = a.lastActive ? new Date(a.lastActive).getTime() : 0;
                 const bTime = b.lastActive ? new Date(b.lastActive).getTime() : 0;
                 return bTime - aTime;
