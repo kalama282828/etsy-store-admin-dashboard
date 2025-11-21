@@ -28,6 +28,20 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
 
     useEffect(() => {
         fetchConversations();
+        
+        // Listen for new messages so the conversation list stays in sync in real-time.
+        const channel = supabase
+            .channel('admin-conversation-feed')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'messages' },
+                () => fetchConversations()
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [users]);
 
     const fetchConversations = async () => {
@@ -35,26 +49,31 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
             setLoading(true);
             const { data: messages, error } = await supabase
                 .from('messages')
-                .select('sender_id, created_at, is_admin_message')
+                .select('conversation_id, sender_id, created_at')
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
 
-            // Group by user email (sender_id)
+            // Group by conversation id (email)
             const conversationMap = new Map<string, ConversationItem>();
 
             messages?.forEach((msg) => {
-                if (msg.sender_id === 'admin') return; // Skip admin messages for grouping
+                if (!msg.conversation_id) return;
 
-                if (!conversationMap.has(msg.sender_id)) {
-                    const user = users.find(u => u.email === msg.sender_id);
-                    conversationMap.set(msg.sender_id, {
-                        email: msg.sender_id,
+                const conversationEmail = msg.conversation_id;
+                const already = conversationMap.get(conversationEmail);
+
+                if (!already) {
+                    const user = users.find(u => u.email === conversationEmail);
+                    conversationMap.set(conversationEmail, {
+                        email: conversationEmail,
                         isRegistered: !!user,
                         lastActive: msg.created_at,
-                        name: user?.store_name,
+                        name: user?.etsy_store_url,
                         isArchived: false // Default, will be updated below
                     });
+                } else if (new Date(msg.created_at).getTime() > new Date(already.lastActive || '').getTime()) {
+                    conversationMap.set(conversationEmail, { ...already, lastActive: msg.created_at });
                 }
             });
 
@@ -117,11 +136,11 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
         if (!window.confirm(t('delete_confirm'))) return;
 
         try {
-            // Delete messages
+            // Delete messages in this conversation
             const { error: msgError } = await supabase
                 .from('messages')
                 .delete()
-                .or(`sender_id.eq.${email},receiver_id.eq.${email}`);
+                .eq('conversation_id', email);
 
             if (msgError) throw msgError;
 

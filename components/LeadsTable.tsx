@@ -18,8 +18,7 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onUpdateUrl }) => {
     const [editUrl, setEditUrl] = useState('');
 
     const filteredLeads = leads.filter(lead =>
-        (lead.first_name && lead.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (lead.last_name && lead.last_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (lead.name && lead.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (lead.email && lead.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (lead.store_url && lead.store_url.toLowerCase().includes(searchTerm.toLowerCase()))
     );
@@ -39,9 +38,9 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onUpdateUrl }) => {
             const csvContent = [
                 headers.join(','),
                 ...filteredLeads.map(lead => [
-                    `"${lead.first_name} ${lead.last_name}"`,
+                    `"${lead.name}"`,
                     lead.email,
-                    lead.package_name,
+                    lead.selected_package,
                     new Date(lead.created_at).toLocaleDateString(),
                     lead.store_url || ''
                 ].join(','))
@@ -144,10 +143,10 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onUpdateUrl }) => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-metallic-700 to-metallic-800 flex items-center justify-center text-xs font-bold text-white border border-white/10">
-                                            {(lead.first_name || lead.email).charAt(0).toUpperCase()}
+                                            {(lead.name || lead.email).charAt(0).toUpperCase()}
                                         </div>
                                         <div>
-                                            <div>{lead.first_name} {lead.last_name}</div>
+                                            <div>{lead.name || '-'}</div>
                                             <div className="text-xs text-metallic-500">{lead.email}</div>
                                         </div>
                                     </div>
@@ -195,7 +194,7 @@ const LeadsTable: React.FC<LeadsTableProps> = ({ leads, onUpdateUrl }) => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-primary-500/10 text-primary-400 border border-primary-500/20">
-                                        {lead.package_name}
+                                        {lead.selected_package}
                                     </span>
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-metallic-400">

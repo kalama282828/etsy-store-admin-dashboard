@@ -163,7 +163,7 @@ const App: React.FC = () => {
         <div className="flex-1">
           {session ? (
             isAdmin ? (
-              <Dashboard siteSettings={siteSettings} onSettingsUpdate={fetchSiteSettings} />
+              <Dashboard session={session} siteSettings={siteSettings} onSettingsUpdate={fetchSiteSettings} />
             ) : (
               <UserDashboard user={session.user} siteSettings={siteSettings} />
             )

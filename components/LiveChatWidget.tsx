@@ -11,6 +11,10 @@ interface LiveChatWidgetProps {
     counterpartId?: string;
     welcomeMessage?: string;
     onUnreadCountChange?: (count: number) => void;
+    onUnreadChange?: (hasUnread: boolean) => void;
+    mode?: 'floating' | 'panel';
+    triggerLabel?: string;
+    onClose?: () => void;
 }
 
 interface UserMessage {

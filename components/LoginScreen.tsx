@@ -12,7 +12,7 @@ import VisitorChatWidget from './VisitorChatWidget';
 import PromotionBanner from './PromotionBanner';
 
 const BUCKET_NAME = 'proof_images';
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://hwukwjitrnzmlglaukmg.supabase.co';
+const supabaseUrl = (import.meta as any).env?.VITE_SUPABASE_URL || 'https://hwukwjitrnzmlglaukmg.supabase.co';
 
 const EN_CONTENT: SiteContent = {
     hero: {

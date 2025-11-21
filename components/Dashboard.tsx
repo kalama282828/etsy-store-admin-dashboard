@@ -8,12 +8,17 @@ import SiteSettingsEditor from './SiteSettingsEditor';
 import ContentEditor from './ContentEditor';
 import PackageEditor from './PackageEditor';
 import UserMessagingPanel from './UserMessagingPanel';
+import StripeSettings from './StripeSettings';
+import BlogGeneratorPanel from './BlogGeneratorPanel';
+import BlogManager from './BlogManager';
 
 interface DashboardProps {
     session: any;
+    siteSettings?: SiteSettings | null;
+    onSettingsUpdate?: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ session }) => {
+const Dashboard: React.FC<DashboardProps> = ({ session, siteSettings: initialSiteSettings, onSettingsUpdate }) => {
     const { t } = useLanguage();
     const [activeView, setActiveView] = useState('dashboard');
     const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
@@ -25,6 +30,13 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
     useEffect(() => {
         fetchData();
     }, []);
+
+    useEffect(() => {
+        // Seed with already-fetched settings coming from App to avoid flicker.
+        if (initialSiteSettings) {
+            setSiteSettings(initialSiteSettings);
+        }
+    }, [initialSiteSettings]);
 
     const fetchData = async () => {
         try {
@@ -143,7 +155,7 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
                 return (
                     <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-lg">
                         <h2 className="text-xl font-bold text-white mb-4">{t('dashboard_menu_booster')}</h2>
-                        <SiteSettingsEditor />
+                        <SiteSettingsEditor onUpdate={onSettingsUpdate || fetchData} />
                     </div>
                 );
             case 'packages':
@@ -156,15 +168,18 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
             case 'stripe':
                 return (
                     <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-lg">
-                        <h2 className="text-xl font-bold text-white mb-4">{t('dashboard_stripe_title')}</h2>
-                        <p className="text-metallic-400">Stripe integration settings coming soon.</p>
+                        <h2 className="text-xl font-bold text-white mb-6">{t('dashboard_stripe_title')}</h2>
+                        <StripeSettings />
                     </div>
                 );
             case 'blog':
                 return (
                     <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-lg">
                         <h2 className="text-xl font-bold text-white mb-4">{t('dashboard_blog_title')}</h2>
-                        <p className="text-metallic-400">Blog management interface coming soon.</p>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <BlogGeneratorPanel />
+                            <BlogManager />
+                        </div>
                     </div>
                 );
             case 'messages':
