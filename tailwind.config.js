@@ -42,6 +42,16 @@ export default {
         'metallic-gradient': 'radial-gradient(circle at center, #27272a 0%, #09090b 100%)',
         'glass-gradient': 'linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)',
       },
+      animation: {
+        'marquee': 'marquee 25s linear infinite',
+        'marquee-slow': 'marquee 40s linear infinite',
+      },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
+      },
     },
   },
   plugins: [],
