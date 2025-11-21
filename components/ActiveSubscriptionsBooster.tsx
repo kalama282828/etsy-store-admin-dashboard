@@ -58,7 +58,7 @@ const TurkeyMap: React.FC = () => {
         const initialSales: Sale[] = [];
         // To ensure a good distribution, we'll use a shuffled list of cities
         const shuffledCities = [...cities].sort(() => 0.5 - Math.random());
-        
+
         for (let i = 0; i < 45; i++) {
             // We loop through the shuffled city list to distribute dots
             // This is better than pure random which can cluster dots.
@@ -73,16 +73,16 @@ const TurkeyMap: React.FC = () => {
 
     return (
         <div className="text-center">
-            <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Türkiye Genelinde Aktif Abonelikler</h2>
-            <p className="mt-3 max-w-2xl mx-auto text-lg text-slate-600">
+            <h2 className="text-3xl font-bold text-white tracking-tight">Türkiye Genelinde Aktif Abonelikler</h2>
+            <p className="mt-3 max-w-2xl mx-auto text-lg text-metallic-400">
                 Platformumuza Türkiye'nin dört bir yanından katılan on binlerce memnun müşterimizden sadece birkaçı.
             </p>
             <div className="mt-10 relative">
-                <div className="relative max-w-4xl mx-auto aspect-[1200/615] bg-slate-200 rounded-lg overflow-hidden shadow-lg">
-                     <img 
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Turkey_provinces_blank_gray.svg/1600px-Turkey_provinces_blank_gray.svg.png" 
-                        alt="Türkiye Haritası" 
-                        className="absolute inset-0 w-full h-full object-contain"
+                <div className="relative max-w-4xl mx-auto aspect-[1200/615] bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+                    <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Turkey_provinces_blank_gray.svg/1600px-Turkey_provinces_blank_gray.svg.png"
+                        alt="Türkiye Haritası"
+                        className="absolute inset-0 w-full h-full object-contain opacity-20 invert"
                     />
                     <svg viewBox="0 0 1200 615" className="absolute inset-0 w-full h-full" aria-hidden="true">
                         <g>
@@ -92,7 +92,7 @@ const TurkeyMap: React.FC = () => {
                                     <circle
                                         r="8"
                                         fill="none"
-                                        stroke="#3b82f6"
+                                        stroke="#6366f1"
                                         strokeWidth="3"
                                     >
                                         <animate
@@ -115,7 +115,7 @@ const TurkeyMap: React.FC = () => {
                                     {/* Inner solid dot */}
                                     <circle
                                         r="7"
-                                        fill="#2563eb"
+                                        fill="#818cf8"
                                         stroke="#ffffff"
                                         strokeWidth="2.5"
                                     />

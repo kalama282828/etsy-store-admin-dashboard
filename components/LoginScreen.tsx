@@ -204,8 +204,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
 
     if (language === 'tr' && (loadingContent || !content)) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-slate-50">
-                <svg className="animate-spin h-10 w-10 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <div className="flex items-center justify-center min-h-screen bg-metallic-950">
+                <svg className="animate-spin h-10 w-10 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
@@ -246,9 +246,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                     ))}
                 </div>
                 {isAuthModalOpen && (
-                    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 animate-fadeIn">
-                        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full relative transform transition-all animate-scaleIn">
-                            <button onClick={() => setIsAuthModalOpen(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors">
+                    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn">
+                        <div className="bg-metallic-900 border border-white/10 rounded-2xl shadow-2xl p-8 max-w-md w-full relative transform transition-all animate-scaleIn">
+                            <button onClick={() => setIsAuthModalOpen(false)} className="absolute top-4 right-4 text-metallic-400 hover:text-white transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                             <Auth etsyUrl={url} language={language} />
@@ -276,14 +276,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                                 <img src={siteSettings.logo_url} alt={`${siteSettings.site_name} logo`} className="h-8 object-contain" />
                             ) : (
                                 <>
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-600" viewBox="0 0 20 20" fill="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500" viewBox="0 0 20 20" fill="currentColor">
                                         <path d="M8 4a1 1 0 100 2h4a1 1 0 100-2H8z" /><path fillRule="evenodd" d="M3 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3.293 8.293a1 1 0 011.414 0L6 9.586V14a1 1 0 11-2 0V9.586L2.293 7.707a1 1 0 010-1.414zM11 14V9.586L12.293 8.293a1 1 0 111.414 1.414L12 11.414V14a1 1 0 11-2 0zM7 14V9.586l-1.707-1.707a1 1 0 00-1.414 1.414L6 11.414V14a1 1 0 102 0zm5 0V9.586l1.707-1.707a1 1 0 10-1.414-1.414L12 11.414V14a1 1 0 102 0z" clipRule="evenodd" /><path d="M4 16a1 1 0 100 2h12a1 1 0 100-2H4z" />
                                     </svg>
-                                    <span className="text-xl font-bold text-slate-800">{siteSettings?.site_name || 'Etsy Admin'}</span>
+                                    <span className="text-xl font-bold text-white">{siteSettings?.site_name || 'Etsy Admin'}</span>
                                 </>
                             )}
                         </div>
-                        <button onClick={() => setIsAuthModalOpen(true)} className="px-5 py-2 text-sm font-medium text-primary-600 border border-primary-600 rounded-full hover:bg-primary-50 transition-colors">
+                        <button onClick={() => setIsAuthModalOpen(true)} className="px-5 py-2 text-sm font-medium text-primary-400 border border-primary-500/50 rounded-full hover:bg-primary-500/10 transition-colors">
                             {language === 'en' ? 'Sign In' : 'Giriş Yap'}
                         </button>
                     </div>
@@ -292,10 +292,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                 <main>
                     <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-28">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight animate-fadeInUp">
+                            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight animate-fadeInUp">
                                 {displayContent.hero.title}
                             </h1>
-                            <p className="mt-6 max-w-2xl mx-auto text-lg text-slate-600 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
+                            <p className="mt-6 max-w-2xl mx-auto text-lg text-metallic-300 animate-fadeInUp" style={{ animationDelay: '0.1s' }}>
                                 {displayContent.hero.subtitle}
                             </p>
                             <form onSubmit={handleUrlSubmit} className="mt-8 max-w-xl mx-auto animate-fadeInUp" style={{ animationDelay: '0.2s' }}>
@@ -305,37 +305,37 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                                         value={url}
                                         onChange={(e) => setUrl(e.target.value)}
                                         placeholder={displayContent.hero.formPlaceholder}
-                                        className="flex-grow w-full px-5 py-3.5 text-base bg-white border border-slate-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400"
+                                        className="flex-grow w-full px-5 py-3.5 text-base bg-black/20 border border-white/10 text-white placeholder-metallic-500 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent backdrop-blur-sm transition-all"
                                     />
                                     <button
                                         type="submit"
-                                        className="px-8 py-3.5 text-base font-semibold text-white bg-primary-600 rounded-full hover:bg-primary-700 transition-colors shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                                        className="px-8 py-3.5 text-base font-semibold text-white bg-primary-600 rounded-full hover:bg-primary-500 transition-all shadow-lg shadow-primary-600/20 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                                     >
                                         {displayContent.hero.formButton}
                                     </button>
                                 </div>
-                                {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+                                {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
                             </form>
                         </div>
                     </section>
 
-                    <section className="py-20 lg:py-24 bg-slate-100">
+                    <section className="py-20 lg:py-24 bg-transparent">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <TurkeyMap />
                         </div>
                     </section>
 
                     {proofImages.length > 0 && (
-                        <section className="py-20 bg-slate-50 overflow-hidden">
+                        <section className="py-20 bg-transparent overflow-hidden">
                             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                                <h2 className="text-center text-3xl font-extrabold text-slate-900 tracking-tight">{displayContent.proof.title}</h2>
-                                <p className="text-center text-slate-500 mt-4 max-w-2xl mx-auto text-lg">{displayContent.proof.subtitle}</p>
+                                <h2 className="text-center text-3xl font-extrabold text-white tracking-tight">{displayContent.proof.title}</h2>
+                                <p className="text-center text-metallic-400 mt-4 max-w-2xl mx-auto text-lg">{displayContent.proof.subtitle}</p>
                             </div>
                             <div className="mt-12">
                                 <div className="flex animate-marquee-slow">
                                     {[...proofImages, ...proofImages].map((image, index) => (
-                                        <div key={`${image.id}-${index}`} className="flex-shrink-0 w-[450px] aspect-video mx-4 rounded-xl overflow-hidden shadow-xl">
-                                            <img src={`${supabaseUrl}/storage/v1/object/public/${BUCKET_NAME}/${image.name}`} alt={`Proof image ${index + 1}`} className="w-full h-full object-cover" />
+                                        <div key={`${image.id}-${index}`} className="flex-shrink-0 w-[450px] aspect-video mx-4 rounded-xl overflow-hidden shadow-xl border border-white/5">
+                                            <img src={`${supabaseUrl}/storage/v1/object/public/${BUCKET_NAME}/${image.name}`} alt={`Proof image ${index + 1}`} className="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity" />
                                         </div>
                                     ))}
                                 </div>
@@ -343,11 +343,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                         </section>
                     )}
 
-                    <section className="py-20 lg:py-28 bg-white">
+                    <section className="py-20 lg:py-28 bg-transparent">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="text-center">
-                                <h2 className="text-3xl font-bold text-slate-900">{displayContent.pricing.title}</h2>
-                                <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600">{displayContent.pricing.subtitle}</p>
+                                <h2 className="text-3xl font-bold text-white">{displayContent.pricing.title}</h2>
+                                <p className="mt-4 max-w-2xl mx-auto text-lg text-metallic-400">{displayContent.pricing.subtitle}</p>
                             </div>
                             <div className="mt-16 max-w-5xl mx-auto">
                                 <PricingSection onPayClick={handlePayClick} language={language} />
