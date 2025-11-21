@@ -6,6 +6,7 @@ import UserTable from './UserTable';
 import LeadsTable from './LeadsTable';
 import SiteSettingsEditor from './SiteSettingsEditor';
 import ContentEditor from './ContentEditor';
+import PackageEditor from './PackageEditor';
 import UserMessagingPanel from './UserMessagingPanel';
 
 interface DashboardProps {
@@ -145,6 +146,13 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
                         <SiteSettingsEditor />
                     </div>
                 );
+            case 'packages':
+                return (
+                    <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-lg">
+                        <h2 className="text-xl font-bold text-white mb-4">{t('dashboard_packages_title')}</h2>
+                        <PackageEditor />
+                    </div>
+                );
             case 'stripe':
                 return (
                     <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-lg">
@@ -234,6 +242,15 @@ const Dashboard: React.FC<DashboardProps> = ({ session }) => {
                             </svg>
                         }
                         label={t('dashboard_menu_content')}
+                    />
+                    <NavItem
+                        id="packages"
+                        icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                            </svg>
+                        }
+                        label={t('dashboard_menu_packages')}
                     />
                     <NavItem
                         id="stripe"
