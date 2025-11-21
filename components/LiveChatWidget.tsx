@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useLanguage } from './LanguageContext';
 
@@ -48,6 +48,8 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
     const [loading, setLoading] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const [statusOnline, setStatusOnline] = useState<boolean | null>(null);
+    const [lastReadByCounterpartAt, setLastReadByCounterpartAt] = useState<string | null>(null);
+    const [readChannel, setReadChannel] = useState<any>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const isOpen = mode === 'panel' ? true : open;
@@ -91,6 +93,19 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
 
     useEffect(() => {
         fetchMessages();
+        // Broadcast-only channel for read receipts (no DB schema needed)
+        const channelReads = supabase
+            .channel(`chat-${conversationId}-reads`, { config: { broadcast: { self: true } } })
+            .on('broadcast', { event: 'read' }, (payload) => {
+                const readPayload = payload.payload as { reader?: string; readAt?: string } | null;
+                if (!readPayload || readPayload.reader === senderId) return;
+                if (readPayload.readAt) {
+                    setLastReadByCounterpartAt(readPayload.readAt);
+                }
+            })
+            .subscribe();
+        setReadChannel(channelReads);
+
         const channel = supabase
             .channel(`live-chat-${conversationId}`)
             .on(
@@ -111,6 +126,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
             .subscribe();
         return () => {
             supabase.removeChannel(channel);
+            supabase.removeChannel(channelReads);
         };
     }, [conversationId, senderId, isOpen]);
 
@@ -127,6 +143,32 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
         onUnreadChange?.(unreadCount > 0);
         onUnreadCountChange?.(unreadCount);
     }, [unreadCount, isOpen, onUnreadChange, onUnreadCountChange]);
+
+    const sendReadReceipt = useCallback(() => {
+        if (!readChannel) return;
+        readChannel.send({
+            type: 'broadcast',
+            event: 'read',
+            payload: {
+                reader: senderId,
+                readAt: new Date().toISOString(),
+            },
+        });
+    }, [readChannel, senderId]);
+
+    // When the panel is open and incoming messages exist, mark as read for counterpart
+    useEffect(() => {
+        if (!isOpen || messages.length === 0) return;
+        const hasIncoming = messages.some((m) => m.sender_id !== senderId);
+        if (hasIncoming) {
+            sendReadReceipt();
+        }
+    }, [messages, isOpen, senderId, sendReadReceipt]);
+
+    const lastOwnMessage = useMemo(
+        () => [...messages].reverse().find((m) => m.sender_id === senderId),
+        [messages, senderId]
+    );
 
     const markPresence = async (online: boolean) => {
         await supabase
@@ -190,6 +232,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
             setInput('');
             fetchMessages();
             onMessageCreated?.();
+            // Read receipt will be sent when counterpart opens or on incoming messages
         }
         setLoading(false);
     };
@@ -214,7 +257,17 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
                     <div key={msg.id} className={`flex ${msg.sender_id === senderId ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm shadow-sm ${msg.sender_id === senderId ? 'bg-primary-600 text-white rounded-br-none' : 'bg-metallic-800 text-metallic-200 rounded-bl-none border border-white/5'}`}>
                             <p>{msg.message}</p>
-                            <span className={`text-[10px] block mt-1 ${msg.sender_id === senderId ? 'text-primary-200' : 'text-metallic-500'}`}>{new Date(msg.created_at).toLocaleTimeString()}</span>
+                            <span className={`text-[10px] block mt-1 ${msg.sender_id === senderId ? 'text-primary-200' : 'text-metallic-500'}`}>
+                                {new Date(msg.created_at).toLocaleTimeString()}
+                                {msg.sender_id === senderId && lastOwnMessage?.id === msg.id && (
+                                    <>
+                                        {' \u2022 '}
+                                        {lastReadByCounterpartAt && new Date(lastReadByCounterpartAt) >= new Date(msg.created_at)
+                                            ? 'Görüldü'
+                                            : 'Gönderildi'}
+                                    </>
+                                )}
+                            </span>
                         </div>
                     </div>
                 ))}
