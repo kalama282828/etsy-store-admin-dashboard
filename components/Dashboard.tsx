@@ -125,7 +125,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
             case 'dashboard':
                 return (
                     <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-slate-900">{t('dashboard_welcome')}</h1>
+                        <h1 className="text-3xl font-bold text-white">{t('dashboard_welcome')}</h1>
                         <StatsCards customers={customers} />
                         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                             <ContentEditor />
@@ -150,14 +150,14 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
             case 'stripe':
                 return (
                     <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-slate-900">{t('dashboard_stripe_title')}</h1>
+                        <h1 className="text-3xl font-bold text-white">{t('dashboard_stripe_title')}</h1>
                         <StripeSettings />
                     </div>
                 );
             case 'blog':
                 return (
                     <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-slate-900">{t('dashboard_blog_title')}</h1>
+                        <h1 className="text-3xl font-bold text-white">{t('dashboard_blog_title')}</h1>
                         <BlogGeneratorPanel />
                         <BlogManager />
                     </div>
@@ -165,7 +165,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
             case 'messages':
                 return (
                     <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-slate-900">{t('dashboard_messages_title')}</h1>
+                        <h1 className="text-3xl font-bold text-white">{t('dashboard_messages_title')}</h1>
                         <UserMessagingPanel users={registeredUsers} />
                     </div>
                 );
@@ -175,19 +175,19 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
     }
 
     return (
-        <div className="bg-slate-100 min-h-screen flex">
-            <aside className="w-64 bg-white flex-shrink-0 border-r border-slate-200 flex flex-col">
-                <div className="h-16 flex items-center px-6 space-x-2 border-b border-slate-200">
+        <div className="bg-metallic-950 min-h-screen flex">
+            <aside className="w-64 bg-metallic-900 flex-shrink-0 border-r border-metallic-800 flex flex-col">
+                <div className="h-16 flex items-center px-6 space-x-2 border-b border-metallic-800">
                     {siteSettings?.logo_url ? (
                         <img src={siteSettings.logo_url} alt={`${siteSettings.site_name} logo`} className="h-8 max-w-[120px] object-contain" />
                     ) : (
                         <>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-600" viewBox="0 0 20 20" fill="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M8 4a1 1 0 100 2h4a1 1 0 100-2H8z" />
                                 <path fillRule="evenodd" d="M3 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3.293 8.293a1 1 0 011.414 0L6 9.586V14a1 1 0 11-2 0V9.586L2.293 7.707a1 1 0 010-1.414zM11 14V9.586L12.293 8.293a1 1 0 111.414 1.414L12 11.414V14a1 1 0 11-2 0zM7 14V9.586l-1.707-1.707a1 1 0 00-1.414 1.414L6 11.414V14a1 1 0 102 0zm5 0V9.586l1.707-1.707a1 1 0 10-1.414-1.414L12 11.414V14a1 1 0 102 0z" clipRule="evenodd" />
                                 <path d="M4 16a1 1 0 100 2h12a1 1 0 100-2H4z" />
                             </svg>
-                            <span className="text-xl font-bold text-slate-800">{siteSettings?.site_name || t('site_name_default')}</span>
+                            <span className="text-xl font-bold text-white">{siteSettings?.site_name || t('site_name_default')}</span>
                         </>
                     )}
                 </div>
@@ -241,7 +241,7 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <p className="mt-2 text-slate-600">{t('dashboard_loading')}</p>
+                            <p className="mt-2 text-metallic-400">{t('dashboard_loading')}</p>
                         </div>
                     )}
 
@@ -271,12 +271,12 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive, onClick }) => 
         onClick={onClick}
         className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors
             ${isActive
-                ? 'bg-primary-100 text-primary-700'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                ? 'bg-primary-900/20 text-primary-400'
+                : 'text-metallic-400 hover:bg-metallic-800 hover:text-white'
             }`
         }
     >
-        <span className={isActive ? 'text-primary-600' : 'text-slate-400'}>{icon}</span>
+        <span className={isActive ? 'text-primary-500' : 'text-metallic-500'}>{icon}</span>
         <span>{label}</span>
     </button>
 )

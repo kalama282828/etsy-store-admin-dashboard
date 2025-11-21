@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { useLanguage } from './LanguageContext';
 
 interface LiveChatWidgetProps {
     conversationId: string; // user email or conversation key
@@ -34,6 +35,7 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
     onClose,
     welcomeMessage,
 }) => {
+    const { t } = useLanguage();
     const [open, setOpen] = useState(mode === 'panel');
     const [messages, setMessages] = useState<UserMessage[]>([]);
     const [input, setInput] = useState('');
@@ -177,44 +179,44 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
     };
 
     const chatBody = (
-        <div className="w-full h-full flex flex-col bg-white rounded-2xl shadow-2xl">
-            <div className="px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+        <div className="w-full h-full flex flex-col bg-metallic-900 rounded-2xl shadow-2xl border border-metallic-800">
+            <div className="px-4 py-3 border-b border-metallic-800 flex items-center justify-between bg-metallic-950/50 rounded-t-2xl">
                 <div>
-                    <p className="text-sm font-semibold text-slate-900">{label}</p>
-                    <p className="text-xs text-slate-500">{statusOnline === null ? 'Durum alınıyor...' : statusOnline ? 'Çevrimiçi' : 'Çevrimdışı'}</p>
+                    <p className="text-sm font-bold text-white">{label}</p>
+                    <p className="text-xs text-metallic-400">{statusOnline === null ? t('status_checking') : statusOnline ? t('status_online') : t('status_offline')}</p>
                 </div>
                 {(mode === 'floating' || onClose) && (
-                    <button onClick={() => onClose ? onClose() : setOpen(false)} className="text-slate-400 hover:text-slate-600">
+                    <button onClick={() => onClose ? onClose() : setOpen(false)} className="text-metallic-400 hover:text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 )}
             </div>
-            <div className="flex-1 px-4 py-3 overflow-y-auto space-y-3">
+            <div className="flex-1 px-4 py-3 overflow-y-auto space-y-3 custom-scrollbar bg-metallic-900">
                 {messages.map((msg) => (
                     <div key={msg.id} className={`flex ${msg.sent_by === senderId ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${msg.sent_by === senderId ? 'bg-primary-100 text-primary-900' : 'bg-slate-100 text-slate-700'}`}>
+                        <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${msg.sent_by === senderId ? 'bg-primary-900/40 text-primary-200 border border-primary-900/50' : 'bg-metallic-800 text-metallic-200 border border-metallic-700'}`}>
                             <p>{msg.message}</p>
-                            <span className="text-[10px] text-slate-500 block mt-1">{new Date(msg.created_at).toLocaleTimeString('tr-TR')}</span>
+                            <span className={`text-[10px] block mt-1 ${msg.sent_by === senderId ? 'text-primary-400/70' : 'text-metallic-500'}`}>{new Date(msg.created_at).toLocaleTimeString()}</span>
                         </div>
                     </div>
                 ))}
                 <div ref={messagesEndRef} />
             </div>
-            <form onSubmit={handleSend} className="px-4 py-3 border-t border-slate-200 flex gap-2">
+            <form onSubmit={handleSend} className="px-4 py-3 border-t border-metallic-800 flex gap-2 bg-metallic-950/30 rounded-b-2xl">
                 <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Mesajınız..."
-                    className="flex-1 rounded-full border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-300"
+                    placeholder={t('chat_placeholder')}
+                    className="flex-1 rounded-full border border-metallic-700 bg-metallic-950 px-3 py-2 text-sm text-metallic-200 focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-metallic-600"
                 />
                 <button
                     type="submit"
                     disabled={loading}
-                    className="px-3 py-2 rounded-full bg-primary-600 text-white text-sm font-semibold hover:bg-primary-700 disabled:opacity-50"
+                    className="px-4 py-2 rounded-full bg-primary-600 text-white text-sm font-semibold hover:bg-primary-500 disabled:opacity-50 transition-colors shadow-lg shadow-primary-900/20"
                 >
-                    Gönder
+                    {t('send')}
                 </button>
             </form>
         </div>

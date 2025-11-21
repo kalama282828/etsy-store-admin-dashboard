@@ -8,7 +8,7 @@ import Dashboard from './components/Dashboard';
 import UserDashboard from './components/UserDashboard';
 import Footer from './components/layout/Footer';
 import { SiteSettings } from './types';
-import { useLanguage } from './components/LanguageContext';
+import { LanguageProvider, useLanguage } from './components/LanguageContext';
 
 // Admin panel credentials for demonstration.
 // To login as admin, use:
@@ -158,14 +158,24 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-100">
-      <div className="flex-1">
-        {isAdmin
-          ? <Dashboard siteSettings={siteSettings} onSettingsUpdate={fetchSiteSettings} />
-          : <UserDashboard user={session.user} siteSettings={siteSettings} />}
+    <LanguageProvider>
+      <div className="min-h-screen bg-metallic-950 text-metallic-200 flex flex-col">
+        <div className="flex-1">
+          {session ? (
+            isAdmin ? (
+              <Dashboard siteSettings={siteSettings} onSettingsUpdate={fetchSiteSettings} />
+            ) : (
+              <UserDashboard user={session.user} siteSettings={siteSettings} />
+            )
+          ) : (
+            // This part should ideally not be reached if !session check above works
+            // but included for completeness based on the provided snippet's structure
+            <LoginScreen siteSettings={siteSettings} />
+          )}
+        </div>
+        <Footer text={siteSettings?.footer_text} />
       </div>
-      <Footer text={siteSettings?.footer_text} />
-    </div>
+    </LanguageProvider>
   );
 };
 

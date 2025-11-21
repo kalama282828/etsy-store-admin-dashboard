@@ -228,7 +228,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
 
     return (
         <>
-            <div className="min-h-screen bg-slate-50 text-slate-800 font-sans overflow-x-hidden">
+            <div className="min-h-screen bg-metallic-950 text-metallic-200 font-sans overflow-x-hidden">
                 <PromotionBanner
                     text={language === 'en' ? (siteSettings?.promotion_banner_text_en || siteSettings?.promotion_banner_text) : siteSettings?.promotion_banner_text}
                     isActive={siteSettings?.promotion_banner_active}
@@ -238,7 +238,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                         <button
                             key={lang}
                             onClick={() => setLanguage(lang)}
-                            className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors ${language === lang ? 'bg-primary-600 text-white border-primary-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                            className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors ${language === lang ? 'bg-primary-600 text-white border-primary-600' : 'bg-metallic-900 text-metallic-400 border-metallic-800 hover:bg-metallic-800'
                                 }`}
                         >
                             {lang.toUpperCase()}

@@ -62,6 +62,24 @@ export const translations = {
     stats_active_users: 'Aktif Kullanıcılar',
     stats_conversion_rate: 'Dönüşüm Oranı',
     stats_active_now: 'Şu An Aktif',
+
+    // Messages
+    messages_title: 'Mesajlar',
+    messages_tab_active: 'Aktif',
+    messages_tab_archived: 'Arşiv',
+    messages_no_active: 'Aktif mesaj bulunmuyor.',
+    messages_no_archived: 'Arşivlenmiş mesaj bulunmuyor.',
+    messages_select_conversation: 'Bir konuşma seçin.',
+    user_status_registered: 'Kayıtlı Üye',
+    archive: 'Arşivle',
+    delete_confirm: 'Bu öğeyi silmek istediğinizden emin misiniz?',
+
+    // Chat Widget
+    status_checking: 'Durum alınıyor...',
+    status_online: 'Çevrimiçi',
+    status_offline: 'Çevrimdışı',
+    chat_placeholder: 'Mesajınız...',
+    send: 'Gönder',
   },
   en: {
     login_title: 'Boost your Etsy store with AI',
@@ -112,5 +130,23 @@ export const translations = {
     stats_active_users: 'Active Users',
     stats_conversion_rate: 'Conversion Rate',
     stats_active_now: 'Active Now',
+
+    // Messages
+    messages_title: 'Messages',
+    messages_tab_active: 'Active',
+    messages_tab_archived: 'Archived',
+    messages_no_active: 'No active messages.',
+    messages_no_archived: 'No archived messages.',
+    messages_select_conversation: 'Select a conversation.',
+    user_status_registered: 'Registered Member',
+    archive: 'Archive',
+    delete_confirm: 'Are you sure you want to delete this item?',
+
+    // Chat Widget
+    status_checking: 'Checking status...',
+    status_online: 'Online',
+    status_offline: 'Offline',
+    chat_placeholder: 'Type a message...',
+    send: 'Send',
   },
 };
