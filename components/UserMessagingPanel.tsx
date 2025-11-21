@@ -145,16 +145,16 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
     };
 
     return (
-        <div className="bg-metallic-900 rounded-2xl shadow-xl border border-metallic-800 overflow-hidden h-[600px] flex">
+        <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl shadow-xl overflow-hidden h-[600px] flex">
             {/* Sidebar - Conversation List */}
-            <div className="w-1/3 border-r border-metallic-800 flex flex-col">
-                <div className="p-4 border-b border-metallic-800 bg-metallic-950/30">
-                    <h2 className="text-lg font-bold text-white mb-4">{t('messages_title')}</h2>
-                    <div className="flex p-1 bg-metallic-950 rounded-lg mb-2">
+            <div className="w-1/3 border-r border-white/5 flex flex-col bg-black/20">
+                <div className="p-4 border-b border-white/5">
+                    <h2 className="text-lg font-bold text-white mb-4 tracking-tight">{t('messages_title')}</h2>
+                    <div className="flex p-1 bg-black/40 rounded-xl mb-2">
                         <button
                             onClick={() => setActiveTab('active')}
-                            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === 'active'
-                                ? 'bg-metallic-800 text-white shadow-sm'
+                            className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all ${activeTab === 'active'
+                                ? 'bg-metallic-800 text-white shadow-lg'
                                 : 'text-metallic-400 hover:text-metallic-200'
                                 }`}
                         >
@@ -162,8 +162,8 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
                         </button>
                         <button
                             onClick={() => setActiveTab('archived')}
-                            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${activeTab === 'archived'
-                                ? 'bg-metallic-800 text-white shadow-sm'
+                            className={`flex-1 py-2 text-xs font-medium rounded-lg transition-all ${activeTab === 'archived'
+                                ? 'bg-metallic-800 text-white shadow-lg'
                                 : 'text-metallic-400 hover:text-metallic-200'
                                 }`}
                         >
@@ -185,7 +185,7 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
                                 <div
                                     key={conv.email}
                                     onClick={() => setSelectedEmail(conv.email)}
-                                    className={`p-4 border-b border-metallic-800 cursor-pointer transition-colors hover:bg-metallic-800/50 ${selectedEmail === conv.email ? 'bg-metallic-800/80 border-l-4 border-l-primary-500' : ''
+                                    className={`p-4 border-b border-white/5 cursor-pointer transition-all hover:bg-white/5 ${selectedEmail === conv.email ? 'bg-primary-500/10 border-l-2 border-l-primary-500' : 'border-l-2 border-l-transparent'
                                         }`}
                                 >
                                     <div className="flex justify-between items-start mb-1">
@@ -193,7 +193,7 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
                                             {conv.name || conv.email}
                                         </span>
                                         {conv.isRegistered && (
-                                            <span className="bg-primary-900/30 text-primary-300 text-[10px] px-1.5 py-0.5 rounded border border-primary-900/50">
+                                            <span className="bg-primary-500/10 text-primary-400 text-[10px] px-2 py-0.5 rounded-full border border-primary-500/20">
                                                 {t('user_status_registered')}
                                             </span>
                                         )}
@@ -243,10 +243,10 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
             </div>
 
             {/* Main Chat Area */}
-            <div className="flex-1 flex flex-col bg-metallic-950/50">
+            <div className="flex-1 flex flex-col bg-transparent relative">
                 {selectedEmail ? (
                     <div className="flex-1 flex flex-col h-full">
-                        <div className="p-4 border-b border-metallic-800 flex justify-between items-center bg-metallic-900">
+                        <div className="p-4 border-b border-white/5 flex justify-between items-center bg-black/20 backdrop-blur-md">
                             <div>
                                 <h3 className="font-bold text-white">
                                     {activeConversations.find(c => c.email === selectedEmail)?.name || selectedEmail}

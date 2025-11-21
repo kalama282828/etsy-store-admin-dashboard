@@ -4,8 +4,8 @@ import { SiteSettings } from '../types';
 import DeleteIcon from './icons/DeleteIcon';
 
 const BUCKET_NAME = 'site_assets';
-const labelBaseStyle = "block text-sm font-medium text-slate-700 mb-1.5";
-const inputBaseStyle = "block w-full px-4 py-2.5 text-sm text-slate-900 bg-slate-100 border border-transparent rounded-lg transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-300 focus:bg-white focus:border-primary-500";
+const labelBaseStyle = "block text-sm font-medium text-metallic-300 mb-1.5";
+const inputBaseStyle = "block w-full px-4 py-2.5 text-sm text-white bg-black/20 border border-white/10 rounded-xl transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:bg-black/30 placeholder-metallic-500";
 
 interface SiteSettingsEditorProps {
     onUpdate: () => void;
@@ -207,11 +207,11 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
 
     if (loading) {
         return (
-            <div className="bg-white p-6 rounded-2xl shadow-xl">
-                <div className="h-8 bg-slate-200 rounded-lg w-1/3 animate-pulse mb-6"></div>
+            <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-xl">
+                <div className="h-8 bg-white/5 rounded-lg w-1/3 animate-pulse mb-6"></div>
                 <div className="space-y-4">
-                    <div className="h-12 bg-slate-100 rounded-lg animate-pulse"></div>
-                    <div className="h-20 bg-slate-100 rounded-lg animate-pulse"></div>
+                    <div className="h-12 bg-white/5 rounded-lg animate-pulse"></div>
+                    <div className="h-20 bg-white/5 rounded-lg animate-pulse"></div>
                 </div>
             </div>
         );
@@ -220,9 +220,9 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
     if (!settings) return null;
 
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-xl">
-            <h2 className="text-xl font-bold text-slate-800 mb-1">Site Ayarları</h2>
-            <p className="text-sm text-slate-500 mb-6">Sitenizin genel görünümünü ve markasını buradan yönetin.</p>
+        <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-xl">
+            <h2 className="text-xl font-bold text-white mb-1">Site Ayarları</h2>
+            <p className="text-sm text-metallic-400 mb-6">Sitenizin genel görünümünü ve markasını buradan yönetin.</p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
@@ -244,16 +244,16 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
 
                 <div>
                     <label className={labelBaseStyle}>Site Logosu</label>
-                    <div className="flex items-center gap-4 p-3 border border-slate-200 rounded-lg">
-                        <div className="w-24 h-12 flex items-center justify-center bg-slate-100 rounded-md overflow-hidden">
+                    <div className="flex items-center gap-4 p-3 border border-white/10 rounded-xl bg-black/20">
+                        <div className="w-24 h-12 flex items-center justify-center bg-white/5 rounded-lg overflow-hidden border border-white/5">
                             {settings.logo_url ? (
                                 <img src={settings.logo_url} alt="Mevcut Logo" className="h-full object-contain" />
                             ) : (
-                                <span className="text-xs text-slate-500">Logo Yok</span>
+                                <span className="text-xs text-metallic-500">Logo Yok</span>
                             )}
                         </div>
                         <div className="flex-grow space-y-2">
-                            <label htmlFor="logo-upload" className={`w-full text-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                            <label htmlFor="logo-upload" className={`w-full text-center px-4 py-2 text-sm font-medium text-metallic-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all ${uploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                                 {uploading ? 'Yükleniyor...' : 'Yeni Logo Yükle'}
                             </label>
                             <input
@@ -261,7 +261,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                                 className="hidden" onChange={handleLogoUpload} disabled={uploading}
                             />
                             {settings.logo_url && (
-                                <button type="button" onClick={handleDeleteLogo} className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors">
+                                <button type="button" onClick={handleDeleteLogo} className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-all">
                                     <DeleteIcon /> Logoyu Sil
                                 </button>
                             )}
@@ -271,25 +271,25 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
 
                 <div>
                     <label className={labelBaseStyle}>Favicon</label>
-                    <div className="flex items-center gap-4 p-3 border border-slate-200 rounded-lg">
-                        <div className="w-12 h-12 flex items-center justify-center bg-slate-100 rounded-md overflow-hidden">
+                    <div className="flex items-center gap-4 p-3 border border-white/10 rounded-xl bg-black/20">
+                        <div className="w-12 h-12 flex items-center justify-center bg-white/5 rounded-lg overflow-hidden border border-white/5">
                             {settings.favicon_url ? (
                                 <img src={settings.favicon_url} alt="Favicon" className="h-8 w-8 object-contain" />
                             ) : (
-                                <span className="text-xs text-slate-500">Yok</span>
+                                <span className="text-xs text-metallic-500">Yok</span>
                             )}
                         </div>
                         <div className="flex-grow space-y-2">
-                            <label htmlFor="favicon-upload" className={`w-full text-center px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
+                            <label htmlFor="favicon-upload" className={`w-full text-center px-4 py-2 text-sm font-medium text-metallic-300 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-all ${uploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                                 {uploading ? 'Yükleniyor...' : 'Favicon Yükle'}
                             </label>
                             <input
                                 id="favicon-upload" type="file" accept="image/png, image/x-icon, image/svg+xml"
                                 className="hidden" onChange={handleFaviconUpload} disabled={uploading}
                             />
-                            <p className="text-xs text-slate-500">Önerilen boyut: 32x32px .ico veya .png</p>
+                            <p className="text-xs text-metallic-500">Önerilen boyut: 32x32px .ico veya .png</p>
                             {settings.favicon_url && (
-                                <button type="button" onClick={handleDeleteFavicon} className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-colors">
+                                <button type="button" onClick={handleDeleteFavicon} className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-xl transition-all">
                                     <DeleteIcon /> Faviconu Sil
                                 </button>
                             )}
@@ -299,8 +299,8 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
 
 
 
-                <div className="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
-                    <h3 className="text-lg font-semibold text-indigo-900 mb-4">Promosyon Bannerı</h3>
+                <div className="p-4 bg-primary-500/10 rounded-xl border border-primary-500/20">
+                    <h3 className="text-lg font-semibold text-primary-400 mb-4">Promosyon Bannerı</h3>
                     <div className="space-y-4">
                         <div className="flex items-center gap-3">
                             <input
@@ -309,9 +309,9 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                                 name="promotion_banner_active"
                                 checked={settings.promotion_banner_active || false}
                                 onChange={handleInputChange}
-                                className="h-5 w-5 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                                className="h-5 w-5 text-primary-600 focus:ring-primary-500 border-white/10 bg-black/20 rounded"
                             />
-                            <label htmlFor="promotion_banner_active" className="text-sm font-medium text-indigo-900">
+                            <label htmlFor="promotion_banner_active" className="text-sm font-medium text-white">
                                 Banner Aktif
                             </label>
                         </div>
@@ -326,7 +326,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                                 placeholder="Örn: %20 İndirim Fırsatı!"
                                 className={inputBaseStyle}
                             />
-                            <p className="text-xs text-slate-500 mt-1">Bu metin sitenin en üstünde kayan yazı olarak görünecektir.</p>
+                            <p className="text-xs text-metallic-500 mt-1">Bu metin sitenin en üstünde kayan yazı olarak görünecektir.</p>
                         </div>
 
                         <div>
@@ -339,7 +339,7 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                                 placeholder="Ex: 20% Discount Opportunity!"
                                 className={inputBaseStyle}
                             />
-                            <p className="text-xs text-slate-500 mt-1">İngilizce dil seçeneğinde görünecek metin.</p>
+                            <p className="text-xs text-metallic-500 mt-1">İngilizce dil seçeneğinde görünecek metin.</p>
                         </div>
                     </div>
                 </div>
@@ -356,10 +356,10 @@ const SiteSettingsEditor: React.FC<SiteSettingsEditorProps> = ({ onUpdate }) => 
                     />
                 </div>
 
-                <div className="flex items-center justify-end space-x-4 pt-4 border-t border-slate-200">
-                    {successMessage && <p className="text-sm text-green-600 animate-fadeIn">{successMessage}</p>}
-                    {error && <p className="text-sm text-red-600">{error}</p>}
-                    <button type="submit" disabled={saving || uploading} className="px-6 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <div className="flex items-center justify-end space-x-4 pt-4 border-t border-white/5">
+                    {successMessage && <p className="text-sm text-green-400 animate-fadeIn">{successMessage}</p>}
+                    {error && <p className="text-sm text-red-400">{error}</p>}
+                    <button type="submit" disabled={saving || uploading} className="px-6 py-2.5 text-sm font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-500 disabled:opacity-50 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg shadow-primary-500/20">
                         {saving ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet'}
                     </button>
                 </div>

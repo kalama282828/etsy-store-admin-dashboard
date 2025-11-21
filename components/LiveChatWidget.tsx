@@ -179,42 +179,42 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
     };
 
     const chatBody = (
-        <div className="w-full h-full flex flex-col bg-metallic-900 rounded-2xl shadow-2xl border border-metallic-800">
-            <div className="px-4 py-3 border-b border-metallic-800 flex items-center justify-between bg-metallic-950/50 rounded-t-2xl">
+        <div className="w-full h-full flex flex-col bg-metallic-900/50 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/5 overflow-hidden">
+            <div className="px-4 py-3 border-b border-white/5 flex items-center justify-between bg-black/20">
                 <div>
-                    <p className="text-sm font-bold text-white">{label}</p>
+                    <p className="text-sm font-bold text-white tracking-tight">{label}</p>
                     <p className="text-xs text-metallic-400">{statusOnline === null ? t('status_checking') : statusOnline ? t('status_online') : t('status_offline')}</p>
                 </div>
                 {(mode === 'floating' || onClose) && (
-                    <button onClick={() => onClose ? onClose() : setOpen(false)} className="text-metallic-400 hover:text-white">
+                    <button onClick={() => onClose ? onClose() : setOpen(false)} className="text-metallic-400 hover:text-white transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
                 )}
             </div>
-            <div className="flex-1 px-4 py-3 overflow-y-auto space-y-3 custom-scrollbar bg-metallic-900">
+            <div className="flex-1 px-4 py-3 overflow-y-auto space-y-3 custom-scrollbar bg-transparent">
                 {messages.map((msg) => (
                     <div key={msg.id} className={`flex ${msg.sent_by === senderId ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${msg.sent_by === senderId ? 'bg-primary-900/40 text-primary-200 border border-primary-900/50' : 'bg-metallic-800 text-metallic-200 border border-metallic-700'}`}>
+                        <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm shadow-sm ${msg.sent_by === senderId ? 'bg-primary-600 text-white rounded-br-none' : 'bg-metallic-800 text-metallic-200 rounded-bl-none border border-white/5'}`}>
                             <p>{msg.message}</p>
-                            <span className={`text-[10px] block mt-1 ${msg.sent_by === senderId ? 'text-primary-400/70' : 'text-metallic-500'}`}>{new Date(msg.created_at).toLocaleTimeString()}</span>
+                            <span className={`text-[10px] block mt-1 ${msg.sent_by === senderId ? 'text-primary-200' : 'text-metallic-500'}`}>{new Date(msg.created_at).toLocaleTimeString()}</span>
                         </div>
                     </div>
                 ))}
                 <div ref={messagesEndRef} />
             </div>
-            <form onSubmit={handleSend} className="px-4 py-3 border-t border-metallic-800 flex gap-2 bg-metallic-950/30 rounded-b-2xl">
+            <form onSubmit={handleSend} className="px-4 py-3 border-t border-white/5 flex gap-2 bg-black/20">
                 <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={t('chat_placeholder')}
-                    className="flex-1 rounded-full border border-metallic-700 bg-metallic-950 px-3 py-2 text-sm text-metallic-200 focus:outline-none focus:ring-2 focus:ring-primary-500 placeholder-metallic-600"
+                    className="flex-1 rounded-xl border border-white/10 bg-black/20 px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 placeholder-metallic-500 transition-all"
                 />
                 <button
                     type="submit"
                     disabled={loading}
-                    className="px-4 py-2 rounded-full bg-primary-600 text-white text-sm font-semibold hover:bg-primary-500 disabled:opacity-50 transition-colors shadow-lg shadow-primary-900/20"
+                    className="px-4 py-2 rounded-xl bg-primary-600 text-white text-sm font-semibold hover:bg-primary-500 disabled:opacity-50 transition-all shadow-lg shadow-primary-500/20"
                 >
                     {t('send')}
                 </button>

@@ -1,105 +1,80 @@
-
-
 import React, { useState, useEffect } from 'react';
-import { Customer, RegisteredUser, Lead, SiteSettings } from '../types';
-import StatsCards from './StatsCards';
-import CustomerTable from './CustomerTable';
-import Header from './Header';
 import { supabase } from '../lib/supabase';
+import { useLanguage } from './LanguageContext';
+import { RegisteredUser, SiteSettings, Lead } from '../types';
 import UserTable from './UserTable';
 import LeadsTable from './LeadsTable';
-import PackageEditor from './PackageEditor';
-import ContentEditor from './ContentEditor';
-import ProofEditor from './ProofEditor';
-import ConversionBooster from './ConversionBooster';
-import LayoutDashboardIcon from './icons/LayoutDashboardIcon';
-import SparklesIcon from './icons/SparklesIcon';
 import SiteSettingsEditor from './SiteSettingsEditor';
-import StripeSettings from './StripeSettings';
-import CreditCardIcon from './icons/CreditCardIcon';
-import BlogManager from './BlogManager';
-import BlogGeneratorPanel from './BlogGeneratorPanel';
 import UserMessagingPanel from './UserMessagingPanel';
 
-import { useLanguage } from './LanguageContext';
-
 interface DashboardProps {
-    siteSettings: SiteSettings | null;
-    onSettingsUpdate: () => void;
+    session: any;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate }) => {
+const Dashboard: React.FC<DashboardProps> = ({ session }) => {
     const { t } = useLanguage();
-    const [customers, setCustomers] = useState<Customer[]>([]);
+    const [activeView, setActiveView] = useState('dashboard');
     const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
     const [leads, setLeads] = useState<Lead[]>([]);
+    const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [activeView, setActiveView] = useState('dashboard');
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const fetchData = async () => {
-        // Don't set loading to true on refetch to avoid flickering
-        setError(null);
-
         try {
-            const [customerRes, userRes, leadRes] = await Promise.all([
-                supabase.from('customers').select('*').order('join_date', { ascending: false }),
-                supabase.rpc('get_all_users'),
-                supabase.from('leads').select('*').order('created_at', { ascending: false })
+            setLoading(true);
+            const [usersRes, leadsRes, settingsRes] = await Promise.all([
+                supabase.from('registered_users').select('*').order('created_at', { ascending: false }),
+                supabase.from('leads').select('*').order('created_at', { ascending: false }),
+                supabase.from('site_settings').select('*').single()
             ]);
 
-            if (customerRes.error) throw new Error(`Müşteri verileri alınırken hata: ${customerRes.error.message}`);
-            setCustomers(customerRes.data as Customer[]);
+            if (usersRes.error) throw usersRes.error;
+            if (leadsRes.error) throw leadsRes.error;
 
-            if (userRes.error) {
-                if (userRes.error.message.includes('function public.get_all_users() does not exist')) {
-                    throw new Error('Yönetici özelliği yapılandırılmamış: `get_all_users` RPC fonksiyonu eksik. Lütfen kurulum SQL betiğini çalıştırın.');
-                }
-                throw new Error(`Kayıtlı kullanıcılar alınırken hata: ${userRes.error.message}`);
-            }
-            setRegisteredUsers(userRes.data as RegisteredUser[]);
-
-            if (leadRes.error) throw new Error(`Müşteri adayları alınırken hata: ${leadRes.error.message}`);
-            setLeads(leadRes.data as Lead[]);
+            setRegisteredUsers(usersRes.data || []);
+            setLeads(leadsRes.data || []);
+            if (settingsRes.data) setSiteSettings(settingsRes.data);
 
         } catch (err: any) {
-            console.error(err);
+            console.error('Error fetching data:', err);
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        // Initial fetch only. Real-time subscriptions removed for free-tier compatibility.
-        fetchData();
-    }, []);
-
-    const handleDeleteUser = async (userId: string) => {
-        try {
-            const { error } = await supabase.rpc('delete_user', { user_id: userId });
-            if (error) throw error;
-
-            // Refresh the user list
-            fetchData();
-            alert(t('success'));
-        } catch (err: any) {
-            console.error('Kullanıcı silinirken hata:', err);
-            alert(`${t('error')}: ${err.message}`);
-        }
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
     };
 
     const handleUpdateUserUrl = async (userId: string, newUrl: string) => {
         try {
-            const { error } = await supabase.rpc('update_user_store_url', { user_id: userId, new_url: newUrl });
+            const { error } = await supabase.rpc('update_user_store_url', {
+                user_uuid: userId,
+                new_url: newUrl
+            });
+
             if (error) throw error;
 
-            // Refresh the user list
-            fetchData();
-            // Optional: Show success toast
-        } catch (err: any) {
-            console.error('URL güncellenirken hata:', err);
-            alert(`${t('error')}: ${err.message}`);
+            // Refresh data
+            const { data: updatedUser, error: fetchError } = await supabase
+                .from('registered_users')
+                .select('*')
+                .eq('id', userId)
+                .single();
+
+            if (fetchError) throw fetchError;
+
+            setRegisteredUsers(prev => prev.map(u => u.id === userId ? updatedUser : u));
+            alert(t('success'));
+        } catch (error: any) {
+            console.error('Error updating URL:', error);
+            alert(t('error') + ': ' + error.message);
         }
     };
 
@@ -112,173 +87,203 @@ const Dashboard: React.FC<DashboardProps> = ({ siteSettings, onSettingsUpdate })
 
             if (error) throw error;
 
-            // Refresh the lead list
-            fetchData();
-        } catch (err: any) {
-            console.error('Lead URL güncellenirken hata:', err);
-            alert(`${t('error')}: ${err.message}`);
+            setLeads(prev => prev.map(l => l.id === leadId ? { ...l, store_url: newUrl } : l));
+            alert(t('success'));
+        } catch (error: any) {
+            console.error('Error updating lead URL:', error);
+            alert(t('error') + ': ' + error.message);
         }
     };
 
-    const renderView = () => {
+    const renderContent = () => {
         switch (activeView) {
             case 'dashboard':
                 return (
-                    <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-white">{t('dashboard_welcome')}</h1>
-                        <StatsCards customers={customers} />
-                        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                            <ContentEditor />
-                            <SiteSettingsEditor onUpdate={onSettingsUpdate} />
+                    <div className="space-y-6">
+                        {/* Stats Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-lg">
+                                <h3 className="text-metallic-400 text-sm font-medium">{t('stats_active_users')}</h3>
+                                <p className="text-3xl font-bold text-white mt-2">{registeredUsers.length}</p>
+                                <div className="mt-2 text-xs text-green-400 flex items-center">
+                                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                                    +12% {t('stats_active_now')}
+                                </div>
+                            </div>
+                            <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-lg">
+                                <h3 className="text-metallic-400 text-sm font-medium">{t('leads_table_title')}</h3>
+                                <p className="text-3xl font-bold text-white mt-2">{leads.length}</p>
+                            </div>
+                            <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-lg">
+                                <h3 className="text-metallic-400 text-sm font-medium">{t('stats_total_revenue')}</h3>
+                                <p className="text-3xl font-bold text-white mt-2">$0.00</p>
+                            </div>
+                            <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 p-6 rounded-2xl shadow-lg">
+                                <h3 className="text-metallic-400 text-sm font-medium">{t('stats_conversion_rate')}</h3>
+                                <p className="text-3xl font-bold text-white mt-2">0%</p>
+                            </div>
                         </div>
-                        <ProofEditor />
-                        <LeadsTable leads={leads} onRefresh={fetchData} onUpdateUrl={handleUpdateLeadUrl} />
-                        <BlogManager />
-                        <UserTable users={registeredUsers} onDelete={handleDeleteUser} onUpdateUrl={handleUpdateUserUrl} />
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <div className="lg:col-span-2">
-                                <CustomerTable customers={customers} onDataChange={fetchData} />
-                            </div>
-                            <div>
-                                <PackageEditor />
-                            </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <UserTable users={registeredUsers} onDelete={() => fetchData()} onUpdateUrl={handleUpdateUserUrl} />
+                            <LeadsTable leads={leads} onUpdateUrl={handleUpdateLeadUrl} />
                         </div>
                     </div>
                 );
             case 'booster':
-                return <ConversionBooster />;
+                return (
+                    <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-lg">
+                        <h2 className="text-xl font-bold text-white mb-4">{t('dashboard_menu_booster')}</h2>
+                        <SiteSettingsEditor />
+                    </div>
+                );
             case 'stripe':
                 return (
-                    <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-white">{t('dashboard_stripe_title')}</h1>
-                        <StripeSettings />
+                    <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-lg">
+                        <h2 className="text-xl font-bold text-white mb-4">{t('dashboard_stripe_title')}</h2>
+                        <p className="text-metallic-400">Stripe integration settings coming soon.</p>
                     </div>
                 );
             case 'blog':
                 return (
-                    <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-white">{t('dashboard_blog_title')}</h1>
-                        <BlogGeneratorPanel />
-                        <BlogManager />
+                    <div className="bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl p-6 shadow-lg">
+                        <h2 className="text-xl font-bold text-white mb-4">{t('dashboard_blog_title')}</h2>
+                        <p className="text-metallic-400">Blog management interface coming soon.</p>
                     </div>
                 );
             case 'messages':
                 return (
-                    <div className="space-y-8">
-                        <h1 className="text-3xl font-bold text-white">{t('dashboard_messages_title')}</h1>
+                    <div className="h-[calc(100vh-12rem)]">
                         <UserMessagingPanel users={registeredUsers} />
                     </div>
                 );
             default:
                 return null;
         }
-    }
+    };
+
+    const NavItem = ({ id, icon, label }: { id: string, icon: any, label: string }) => (
+        <button
+            onClick={() => setActiveView(id)}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${activeView === id
+                ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20 shadow-[0_0_20px_rgba(99,102,241,0.1)]'
+                : 'text-metallic-400 hover:bg-white/5 hover:text-white border border-transparent'
+                }`}
+        >
+            <div className={`${activeView === id ? 'text-primary-400' : 'text-metallic-500 group-hover:text-white'} transition-colors`}>
+                {icon}
+            </div>
+            <span className="font-medium text-sm">{label}</span>
+            {activeView === id && (
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-400 shadow-[0_0_8px_currentColor]"></div>
+            )}
+        </button>
+    );
 
     return (
-        <div className="bg-metallic-950 min-h-screen flex">
-            <aside className="w-64 bg-metallic-900 flex-shrink-0 border-r border-metallic-800 flex flex-col">
-                <div className="h-16 flex items-center px-6 space-x-2 border-b border-metallic-800">
-                    {siteSettings?.logo_url ? (
-                        <img src={siteSettings.logo_url} alt={`${siteSettings.site_name} logo`} className="h-8 max-w-[120px] object-contain" />
-                    ) : (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary-500" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M8 4a1 1 0 100 2h4a1 1 0 100-2H8z" />
-                                <path fillRule="evenodd" d="M3 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3.293 8.293a1 1 0 011.414 0L6 9.586V14a1 1 0 11-2 0V9.586L2.293 7.707a1 1 0 010-1.414zM11 14V9.586L12.293 8.293a1 1 0 111.414 1.414L12 11.414V14a1 1 0 11-2 0zM7 14V9.586l-1.707-1.707a1 1 0 00-1.414 1.414L6 11.414V14a1 1 0 102 0zm5 0V9.586l1.707-1.707a1 1 0 10-1.414-1.414L12 11.414V14a1 1 0 102 0z" clipRule="evenodd" />
-                                <path d="M4 16a1 1 0 100 2h12a1 1 0 100-2H4z" />
+        <div className="flex h-screen bg-metallic-950 overflow-hidden relative">
+            {/* Background Gradient */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-metallic-900 via-metallic-950 to-black z-0 pointer-events-none"></div>
+
+            {/* Sidebar */}
+            <aside className="w-64 bg-metallic-900/50 backdrop-blur-xl border-r border-white/5 flex flex-col relative z-10">
+                <div className="p-6 border-b border-white/5">
+                    <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-500/20">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
-                            <span className="text-xl font-bold text-white">{siteSettings?.site_name || t('site_name_default')}</span>
-                        </>
-                    )}
+                        </div>
+                        <span className="text-xl font-bold text-white tracking-tight">
+                            {siteSettings?.site_name || t('site_name_default')}
+                        </span>
+                    </div>
                 </div>
                 <nav className="p-4 space-y-2 flex-1">
                     <NavItem
-                        icon={<LayoutDashboardIcon />}
-                        label={t('dashboard_menu_dashboard')}
-                        isActive={activeView === 'dashboard'}
-                        onClick={() => setActiveView('dashboard')}
-                    />
-                    <NavItem
-                        icon={<SparklesIcon />}
-                        label={t('dashboard_menu_booster')}
-                        isActive={activeView === 'booster'}
-                        onClick={() => setActiveView('booster')}
-                    />
-                    <NavItem
-                        icon={<CreditCardIcon />}
-                        label={t('dashboard_menu_stripe')}
-                        isActive={activeView === 'stripe'}
-                        onClick={() => setActiveView('stripe')}
-                    />
-                    <NavItem
+                        id="dashboard"
                         icon={
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M4 5h16a1 1 0 011 1v9a1 1 0 01-1 1h-7v2h5a1 1 0 110 2H8a1 1 0 110-2h5v-2H4a1 1 0 01-1-1V6a1 1 0 011-1zm1 9h14V7H5v7z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                            </svg>
+                        }
+                        label={t('dashboard_menu_dashboard')}
+                    />
+                    <NavItem
+                        id="booster"
+                        icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        }
+                        label={t('dashboard_menu_booster')}
+                    />
+                    <NavItem
+                        id="stripe"
+                        icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                            </svg>
+                        }
+                        label={t('dashboard_menu_stripe')}
+                    />
+                    <NavItem
+                        id="blog"
+                        icon={
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                             </svg>
                         }
                         label={t('dashboard_menu_blog')}
-                        isActive={activeView === 'blog'}
-                        onClick={() => setActiveView('blog')}
                     />
                     <NavItem
+                        id="messages"
                         icon={
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M2.25 6.75A2.25 2.25 0 0 1 4.5 4.5h15a2.25 2.25 0 0 1 2.25 2.25v10.5A2.25 2.25 0 0 1 19.5 19.5h-15A2.25 2.25 0 0 1 2.25 17.25V6.75zm2.25-.75a.75.75 0 0 0-.75.75v.305l8.25 5.156 8.25-5.156v-.305a.75.75 0 0 0-.75-.75h-15zm15.75 3.195-7.614 4.764a.75.75 0 0 1-.772 0L4.5 9.195v8.055a.75.75 0 0 0 .75.75h15a.75.75 0 0 0 .75-.75V9.195z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                             </svg>
                         }
                         label={t('dashboard_menu_messages')}
-                        isActive={activeView === 'messages'}
-                        onClick={() => setActiveView('messages')}
                     />
                 </nav>
             </aside>
-            <div className="flex-1 flex flex-col">
-                <Header />
-                <main className="p-4 sm:p-6 lg:p-8 flex-1 overflow-y-auto">
-                    {loading && (
-                        <div className="text-center py-10">
-                            <svg className="animate-spin mx-auto h-8 w-8 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            <p className="mt-2 text-metallic-400">{t('dashboard_loading')}</p>
+
+            {/* Main Content */}
+            <main className="flex-1 overflow-y-auto bg-transparent relative z-10 custom-scrollbar">
+                <div className="p-8">
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 className="text-2xl font-bold text-white tracking-tight">{t('dashboard_welcome')}</h1>
+                            <p className="text-metallic-400 text-sm mt-1">{new Date().toLocaleDateString('tr-TR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        </div>
+                        <div className="flex gap-4">
+                            <button className="p-2 rounded-xl bg-metallic-900/50 border border-white/10 text-metallic-400 hover:text-white hover:bg-white/5 transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                </svg>
+                            </button>
+                            <button
+                                onClick={handleLogout}
+                                className="px-4 py-2 bg-metallic-900/50 border border-white/10 text-metallic-300 rounded-xl hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition-all text-sm font-medium"
+                            >
+                                {t('site_name_default') === 'Admin' ? 'Logout' : 'Çıkış Yap'}
+                            </button>
+                        </div>
+                    </div>
+
+                    {loading ? (
+                        <div className="flex items-center justify-center h-64">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+                        </div>
+                    ) : (
+                        <div className="animate-fade-in">
+                            {renderContent()}
                         </div>
                     )}
-
-                    {error && (
-                        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6" role="alert">
-                            <p className="font-bold">{t('dashboard_error_title')}</p>
-                            <p>{error}</p>
-                        </div>
-                    )}
-
-                    {!loading && !error && renderView()}
-                </main>
-            </div>
+                </div>
+            </main>
         </div>
     );
 };
-
-interface NavItemProps {
-    icon: React.ReactNode;
-    label: string;
-    isActive: boolean;
-    onClick: () => void;
-}
-
-const NavItem: React.FC<NavItemProps> = ({ icon, label, isActive, onClick }) => (
-    <button
-        onClick={onClick}
-        className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors
-            ${isActive
-                ? 'bg-primary-900/20 text-primary-400'
-                : 'text-metallic-400 hover:bg-metallic-800 hover:text-white'
-            }`
-        }
-    >
-        <span className={isActive ? 'text-primary-500' : 'text-metallic-500'}>{icon}</span>
-        <span>{label}</span>
-    </button>
-)
 
 export default Dashboard;
