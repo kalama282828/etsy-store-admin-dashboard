@@ -38,7 +38,7 @@ const BlogSection: React.FC = () => {
                 </div>
                 <div className="mt-12 grid gap-8 md:grid-cols-3">
                     {posts.map(post => (
-                        <article key={post.id} className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl overflow-hidden shadow-xl hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:-translate-y-1 transition-all duration-300 group">
+                        <article key={post.id} className="bg-white/[0.03] backdrop-blur-3xl border border-white/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-[0_8px_32px_0_rgba(99,102,241,0.5)] hover:-translate-y-1 transition-all duration-300 group">
                             {post.hero_image && (
                                 <img src={post.hero_image} alt={post.title} className="h-40 w-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                             )}
@@ -62,8 +62,8 @@ const BlogSection: React.FC = () => {
                 </div>
             </div>
             {activePost && (
-                <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-                    <article className="bg-metallic-900/80 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fadeIn">
+                    <article className="bg-white/[0.03] backdrop-blur-3xl border border-white/30 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 relative">
                         <button
                             onClick={() => setActivePost(null)}
                             className="absolute top-4 right-4 text-metallic-400 hover:text-white transition-colors"

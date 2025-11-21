@@ -228,7 +228,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
 
     return (
         <>
-            <div className="min-h-screen bg-metallic-950 text-metallic-200 font-sans overflow-x-hidden">
+            <div className="min-h-screen bg-metallic-950 text-metallic-200 font-sans overflow-x-hidden relative">
+                {/* Animated Background Orbs for Glassmorphism */}
+                <div className="fixed inset-0 overflow-hidden pointer-events-none">
+                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-primary-500/30 to-purple-500/30 rounded-full blur-3xl animate-float"></div>
+                    <div className="absolute top-1/3 right-1/4 w-80 h-80 bg-gradient-to-r from-blue-500/25 to-cyan-500/25 rounded-full blur-3xl animate-float-slow"></div>
+                    <div className="absolute bottom-1/4 left-1/3 w-72 h-72 bg-gradient-to-r from-pink-500/20 to-rose-500/20 rounded-full blur-3xl animate-float-reverse"></div>
+                    <div className="absolute bottom-1/3 right-1/3 w-96 h-96 bg-gradient-to-r from-indigo-500/25 to-primary-500/25 rounded-full blur-3xl animate-float"></div>
+                </div>
+
                 <PromotionBanner
                     text={language === 'en' ? (siteSettings?.promotion_banner_text_en || siteSettings?.promotion_banner_text) : siteSettings?.promotion_banner_text}
                     isActive={siteSettings?.promotion_banner_active}
@@ -246,8 +254,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                     ))}
                 </div>
                 {isAuthModalOpen && (
-                    <div className="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-fadeIn">
-                        <div className="bg-metallic-900/80 backdrop-blur-2xl border border-white/20 rounded-2xl shadow-2xl p-8 max-w-md w-full relative transform transition-all animate-scaleIn">
+                    <div className="fixed inset-0 bg-black/60 backdrop-blur-xl z-50 flex items-center justify-center p-4 animate-fadeIn">
+                        <div className="bg-white/[0.03] backdrop-blur-3xl border border-white/30 rounded-3xl shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] p-8 max-w-md w-full relative transform transition-all animate-scaleIn">
                             <button onClick={() => setIsAuthModalOpen(false)} className="absolute top-4 right-4 text-metallic-400 hover:text-white transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
@@ -366,7 +374,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ siteSettings }) => {
                             </div>
                             <div className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {displayContent.features.cards.map((feature, index) => (
-                                    <div key={index} className="bg-white/5 backdrop-blur-2xl p-6 rounded-2xl transition-all duration-300 hover:bg-white/10 hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:-translate-y-2 border border-white/10 hover:border-primary-400/50 group">
+                                    <div key={index} className="bg-white/[0.03] backdrop-blur-3xl p-6 rounded-3xl transition-all duration-300 hover:bg-white/[0.08] hover:shadow-[0_8px_32px_0_rgba(99,102,241,0.5)] hover:-translate-y-2 border border-white/20 hover:border-primary-400/70 group">
                                         <div className="flex-shrink-0 w-12 h-12 bg-primary-500/10 text-primary-400 rounded-xl flex items-center justify-center group-hover:bg-primary-500/20 transition-colors">
                                             {featureIcons[index % featureIcons.length]}
                                         </div>

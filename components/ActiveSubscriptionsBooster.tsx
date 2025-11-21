@@ -78,7 +78,7 @@ const TurkeyMap: React.FC = () => {
                 Platformumuza Türkiye'nin dört bir yanından katılan on binlerce memnun müşterimizden sadece birkaçı.
             </p>
             <div className="mt-10 relative">
-                <div className="relative max-w-4xl mx-auto aspect-[1200/615] bg-metallic-900/50 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+                <div className="relative max-w-4xl mx-auto aspect-[1200/615] bg-white/[0.03] backdrop-blur-3xl border border-white/20 rounded-3xl overflow-hidden shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]">
                     <img
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Turkey_provinces_blank_gray.svg/1600px-Turkey_provinces_blank_gray.svg.png"
                         alt="Türkiye Haritası"

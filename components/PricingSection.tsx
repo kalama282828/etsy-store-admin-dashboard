@@ -76,7 +76,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onPayClick, language = 
                 </p>
             ) : (
                 packages.map((pkg) => (
-                    <div key={pkg.name} className={`bg-white/5 backdrop-blur-2xl p-8 rounded-2xl shadow-xl transition-transform transform ${pkg.isPopular ? 'border border-primary-400/60 scale-105 shadow-[0_8px_32px_0_rgba(99,102,241,0.3)]' : 'border border-white/10 hover:border-white/20'}`}>
+                    <div key={pkg.name} className={`bg-white/[0.03] backdrop-blur-3xl p-8 rounded-3xl shadow-xl transition-transform transform ${pkg.isPopular ? 'border-2 border-primary-400/80 scale-105 shadow-[0_8px_32px_0_rgba(99,102,241,0.5)]' : 'border border-white/20 hover:border-white/40'}`}>
                         {pkg.isPopular && <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg shadow-primary-600/20">Popüler</div>}
                         <div className="text-center">
                             <h3 className="text-xl font-bold text-white">{pkg.name}</h3>
