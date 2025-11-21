@@ -62,9 +62,10 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
             const conversationMap = new Map<string, ConversationItem>();
 
             messages?.forEach((msg) => {
-                if (!msg.conversation_id) return;
+                // Fallback: some eski kayıtlar conversation_id içermeyebilir, o zaman sender_id'yi kullan.
+                const conversationEmail = msg.conversation_id || (msg.sender_id !== 'admin' ? msg.sender_id : null);
+                if (!conversationEmail) return;
 
-                const conversationEmail = msg.conversation_id;
                 const already = conversationMap.get(conversationEmail);
 
                 if (!already) {
@@ -96,7 +97,13 @@ const UserMessagingPanel: React.FC<UserMessagingPanelProps> = ({ users }) => {
                 });
             }
 
-            setActiveConversations(Array.from(conversationMap.values()));
+            // Most recent first
+            const sorted = Array.from(conversationMap.values()).sort((a, b) => {
+                const aTime = a.lastActive ? new Date(a.lastActive).getTime() : 0;
+                const bTime = b.lastActive ? new Date(b.lastActive).getTime() : 0;
+                return bTime - aTime;
+            });
+            setActiveConversations(sorted);
         } catch (error) {
             console.error('Error fetching conversations:', error);
         } finally {

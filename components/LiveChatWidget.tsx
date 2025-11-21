@@ -91,19 +91,18 @@ const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
 
     useEffect(() => {
         fetchMessages();
-        const intervalId = window.setInterval(fetchMessages, 5000);
+        const intervalId = window.setInterval(fetchMessages, 3000);
         const channel = supabase
             .channel(`live-chat-${conversationId}`)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => {
-                if (payload.new) {
-                    const msg = payload.new as UserMessage;
-                    setMessages((prev) => [...prev, msg]);
-                    if (payload.eventType === 'INSERT') {
-                        onMessageCreated?.();
-                    }
-                    if (msg.sender_id !== senderId && !isOpen) {
-                        setUnreadCount(prev => prev + 1);
-                    }
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, (payload) => {
+                const msg = payload.new as UserMessage | null;
+                if (!msg || msg.conversation_id !== conversationId) return;
+                setMessages((prev) => [...prev, msg]);
+                if (payload.eventType === 'INSERT') {
+                    onMessageCreated?.();
+                }
+                if (msg.sender_id !== senderId && !isOpen) {
+                    setUnreadCount(prev => prev + 1);
                 }
             })
             .subscribe();
